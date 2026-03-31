@@ -57,7 +57,6 @@ export const DashboardHeader = ({ user, onSignOut }) => {
             <ChevronDown className={`w-3 h-3 text-on-surface-variant transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
-          {/* the drop down for profile */}
           {dropdownOpen && (
             <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-surface-container overflow-hidden z-45">
               <button

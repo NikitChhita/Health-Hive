@@ -6,7 +6,7 @@ const ITEMS = [
   {
     icon: AlertTriangle,
     title: "Not Medical Advice",
-    description: "All AI outputs are experimental. HealthHive is a research tool — never use it as a substitute for professional medical care.",
+    description: "All AI outputs are experimental. HealthHive is a research tool —  it is not as a substitute for professional medical care.",
   },
   {
     icon: FlaskConical,
