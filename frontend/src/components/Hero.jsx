@@ -25,7 +25,7 @@ export const Hero = ({ onStartClick }) => {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="text-5xl md:text-7xl font-headline font-extrabold tracking-tight text-on-surface leading-[1.1] mb-6"
         >
-          AI Symptom Triage, <br />
+          AI Symptom Checker, <br />
           <span className="text-editorial-gradient">Explored.</span>
         </motion.h1>
 
@@ -35,7 +35,7 @@ export const Hero = ({ onStartClick }) => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-2xl mx-auto mb-10"
         >
-          HealthHive is a research platform testing whether AI can consistently classify symptom urgency — Emergency, High, Medium, or Low — and direct users to appropriate resources. All outputs are experimental.
+          HealthHive is a research platform testing whether AI can consistently classify symptom urgency: Emergency, High, Medium, or Low, and direct our users to appropriate resources. All outputs are currently experimental.
         </motion.p>
 
         <motion.div
