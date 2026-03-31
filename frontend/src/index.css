@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --color-surface: #f6fafb;
+  --color-surface-bright: #f6fafb;
+  --color-surface-dim: #d7dbdc;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f4f5;
+  --color-surface-container: #ebeef0;
+  --color-surface-container-high: #e5e9ea;
+  --color-surface-container-highest: #dfe3e4;
+
+  --color-primary: #006070;
+  --color-primary-container: #007b8e;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #e2f9ff;
+
+  --color-secondary: #4c616c;
+  --color-secondary-container: #cfe6f2;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #526772;
+
+  --color-tertiary: #00635b;
+  --color-tertiary-container: #007e74;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #cefff7;
+
+  --color-on-surface: #181c1d;
+  --color-on-surface-variant: #3e484b;
+  --color-outline: #6e797c;
+  --color-outline-variant: #bec8cc;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --radius-xl: 0.5rem;
+  --radius-2xl: 0.75rem;
+  --radius-3xl: 1.5rem;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-body antialiased;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .text-editorial-gradient {
+    background: linear-gradient(135deg, #006070 0%, #007b8e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .ambient-shadow {
+    box-shadow: 0px 12px 32px rgba(24, 28, 29, 0.06);
+  }
+
+  .cta-gradient {
+    background: linear-gradient(135deg, #006070 0%, #007b8e 100%);
+  }
+}
