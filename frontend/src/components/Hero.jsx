@@ -5,8 +5,8 @@ import { ArrowRight, ShieldCheck, FlaskConical } from 'lucide-react';
 export const Hero = ({ onStartClick }) => {
   return (
     <section className="relative pt-32 pb-16 px-6 md:pt-48 md:pb-24 overflow-hidden">
-      <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] bg-tertiary/5 rounded-full blur-3xl pointer-events-none" />
+      <div aria-hidden="true" className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+      <div aria-hidden="true" className="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/4 w-[400px] h-[400px] bg-tertiary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-5xl mx-auto relative z-10 text-center">
         <motion.div

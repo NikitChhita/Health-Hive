@@ -56,20 +56,23 @@ export const SymptomChecker = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Age</label>
+                <label htmlFor="sc-age" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Age</label>
                 <input
+                  id="sc-age"
                   required
                   type="number"
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
                   placeholder="e.g. 25"
+                  autoComplete="age"
                   className="w-full px-4 py-4 bg-surface-container rounded-2xl text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Gender</label>
+                <label htmlFor="sc-gender" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Gender</label>
                 <select
+                  id="sc-gender"
                   required
                   name="gender"
                   value={formData.gender}
@@ -86,8 +89,9 @@ export const SymptomChecker = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Primary Symptoms</label>
+              <label htmlFor="sc-symptoms" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Primary Symptoms</label>
               <textarea
+                id="sc-symptoms"
                 required
                 name="symptoms"
                 value={formData.symptoms}
@@ -100,8 +104,9 @@ export const SymptomChecker = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Duration</label>
+                <label htmlFor="sc-duration" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Duration</label>
                 <input
+                  id="sc-duration"
                   required
                   type="text"
                   name="duration"
@@ -112,18 +117,22 @@ export const SymptomChecker = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Severity (1-10)</label>
+                <label htmlFor="sc-severity" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider ml-1">Severity (1-10)</label>
                 <div className="flex items-center gap-4">
                   <input
+                    id="sc-severity"
                     type="range"
                     min="1"
                     max="10"
                     name="severity"
                     value={formData.severity}
                     onChange={handleChange}
+                    aria-valuemin={1}
+                    aria-valuemax={10}
+                    aria-valuenow={Number(formData.severity)}
                     className="flex-1 h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary"
                   />
-                  <span className="text-lg font-bold text-primary w-8 text-center">{formData.severity}</span>
+                  <span aria-hidden="true" className="text-lg font-bold text-primary w-8 text-center">{formData.severity}</span>
                 </div>
               </div>
             </div>

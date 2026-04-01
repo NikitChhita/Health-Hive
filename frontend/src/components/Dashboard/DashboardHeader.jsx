@@ -20,9 +20,10 @@ export const DashboardHeader = ({ user, onSignOut }) => {
     <header className="h-20 bg-white border-b border-surface-container px-6 flex items-center justify-between sticky top-0 z-40">
       <div className="flex-1 max-w-xl">
         <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant group-focus-within:text-primary transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant group-focus-within:text-primary transition-colors" aria-hidden="true" />
           <input
-            type="text"
+            type="search"
+            aria-label="Search symptoms or previous analyses"
             placeholder="Search symptoms or previous analyses..."
             className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all"
           />
@@ -30,9 +31,9 @@ export const DashboardHeader = ({ user, onSignOut }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative p-3 text-on-surface-variant hover:bg-surface-container rounded-2xl transition-all group">
-          <Bell className="w-5 h-5 group-hover:text-primary" />
-          <span className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-white" />
+        <button aria-label="Notifications" className="relative p-3 text-on-surface-variant hover:bg-surface-container rounded-2xl transition-all group">
+          <Bell className="w-5 h-5 group-hover:text-primary" aria-hidden="true" />
+          <span aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-white" />
         </button>
 
         <div className="h-10 w-px bg-surface-container mx-2" />

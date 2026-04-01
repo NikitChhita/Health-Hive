@@ -4,12 +4,15 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
 import { Ethics } from './components/Ethics';
+import { About } from './components/About';
 import { CTA } from './components/CTA';
 import { Footer } from './components/Footer';
 import { BottomNav } from './components/BottomNav';
 import { SignInModal } from './components/SignInModal';
 import { SymptomChecker } from './components/SymptomChecker';
 import { Dashboard } from './components/Dashboard/Dashboard';
+import { AnalysisHistory } from './components/Dashboard/AnalysisHistory';
+import { Settings } from './components/Dashboard/Settings';
 
 // Protected route (It will redirect if a user is not logged in)
 const ProtectedRoute = ({ user, children }) => {
@@ -52,6 +55,26 @@ export default function App() {
         }
       />
 
+      {/* Analysis History - protected */}
+      <Route
+        path="/history"
+        element={
+          <ProtectedRoute user={user}>
+            <AnalysisHistory onSignOut={handleSignOut} user={user} />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Settings - protected */}
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute user={user}>
+            <Settings onSignOut={handleSignOut} user={user} />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Symptom Checker - protected */}
       <Route
         path="/symptom-checker"
@@ -77,6 +100,7 @@ export default function App() {
                 <Hero onStartClick={openSignIn} />
                 <Features />
                 <Ethics />
+                <About />
                 <CTA onStartClick={openSignIn} />
               </main>
               <Footer onHomeClick={() => navigate('/')} />
