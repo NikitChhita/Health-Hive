@@ -1,5 +1,4 @@
 import React from 'react';
-import { ShieldCheck } from 'lucide-react';
 
 export const Footer = ({ onHomeClick }) => {
   return (
@@ -10,9 +9,11 @@ export const Footer = ({ onHomeClick }) => {
             onClick={onHomeClick}
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <ShieldCheck className="text-white w-5 h-5" />
-            </div>
+            <svg viewBox="0 0 1024 1024" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1024" height="1024" rx="200" fill="#006070"/>
+              <path d="M512 210 L720 332 L720 676 L512 798 L304 676 L304 332 Z" stroke="#FFFFFF" strokeWidth="36" fill="none"/>
+              <path d="M512 382 L512 626 M398 504 L626 504" stroke="#FFFFFF" strokeWidth="40" strokeLinecap="round"/>
+            </svg>
             <span className="font-headline font-bold text-xl tracking-tight text-primary">HealthHive</span>
           </button>
 
