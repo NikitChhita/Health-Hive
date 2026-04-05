@@ -1,9 +1,9 @@
-require("dotenv").config();
-
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const usersRoutes = require('./routes/user-routes');
+import 'dotenv/config';
+import express from 'express';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import usersRoutes from './routes/user-routes.js';
+import analyzeRouter from './routes/analyze.js';
 
 const app = express();
 
@@ -19,6 +19,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/api/analyze", analyzeRouter);
 app.use('/api/users', usersRoutes);
 
 const url = process.env.MONGO_URL;

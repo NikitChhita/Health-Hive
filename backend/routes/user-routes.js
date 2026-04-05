@@ -1,10 +1,10 @@
-const express = require('express');
-const { check } = require('express-validator');
-const usersController = require('../controllers/users-controller');
+import express from 'express';
+import { check } from 'express-validator';
+import { getUsers, signup, login, getCurrentUser } from '../controllers/users-controller.js';
 
 const router = express.Router();
 
-router.get('/', usersController.getUsers);
+router.get('/', getUsers);
 
 router.post(
   '/signup',
@@ -13,11 +13,11 @@ router.post(
     check('email').normalizeEmail().isEmail(),
     check('password').isLength({ min: 6 })
   ],
-  usersController.signup
+  signup
 );
 
-router.post('/login', usersController.login);
+router.post('/login', login);
 
-router.get('/me', usersController.getCurrentUser);
+router.get('/me', getCurrentUser);
 
-module.exports = router;
+export default router;

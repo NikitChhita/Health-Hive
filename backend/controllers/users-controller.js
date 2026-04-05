@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User from '../models/user.js';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -133,7 +133,4 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
-exports.getUsers = getUsers;
-exports.signup = signup;
-exports.login = login;
-exports.getCurrentUser = getCurrentUser;
+export { getUsers, signup, login, getCurrentUser };
