@@ -9,12 +9,17 @@ const app = express();
 
 app.use(bodyParser.json());
 
+const allowedOrigins = [
+  "https://health-hive-jade.vercel.app",
+  "http://localhost:5173"
+];
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://health-hive-jade.vercel.app");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
   if (req.method === "OPTIONS") {
     return res.sendStatus(200);
