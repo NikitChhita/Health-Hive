@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, User, ChevronDown, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // 1. Added useNavigate
+import { Search, Bell, User, ChevronDown, LogOut, Settings } from 'lucide-react'; // 2. Added Settings icon
 
 export const DashboardHeader = ({ user, onSignOut }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate(); // 3. Initialize navigate
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -38,7 +39,6 @@ export const DashboardHeader = ({ user, onSignOut }) => {
 
         <div className="h-10 w-px bg-surface-container mx-2" />
 
-        {/* Profile dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -60,6 +60,20 @@ export const DashboardHeader = ({ user, onSignOut }) => {
 
           {dropdownOpen && (
             <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-surface-container overflow-hidden z-45">
+              {/* 4. Added Settings Button */}
+              <button
+                onClick={() => {
+                  setDropdownOpen(false);
+                  navigate('/settings');
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all"
+              >
+                <Settings className="w-4 h-4" />
+                Settings
+              </button>
+
+              <div className="h-px bg-surface-container" /> {/* Optional Divider */}
+
               <button
                 onClick={() => {
                   setDropdownOpen(false);

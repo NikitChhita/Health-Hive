@@ -675,6 +675,7 @@ export const SymptomChecker = () => {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setAnalysis(data.analysis);
+      setRating(data.rating); // add this state
       setSubmitted(true);
     } catch (err) {
       setError("Something went wrong. Please try again.");
