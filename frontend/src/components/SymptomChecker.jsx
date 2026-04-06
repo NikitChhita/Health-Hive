@@ -666,16 +666,19 @@ export const SymptomChecker = () => {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:5001/api/analyze", {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/analyze`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ context, symptoms, history }),
       });
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setAnalysis(data.analysis);
-      setRating(data.rating); // add this state
       setSubmitted(true);
     } catch (err) {
       setError("Something went wrong. Please try again.");

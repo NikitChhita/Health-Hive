@@ -12,7 +12,7 @@ You are a helpful medical intake assistant. A patient has submitted health infor
 Respond ONLY with a valid JSON object in this exact format, nothing else:
 {
   "rating": "Low" | "Moderate" | "High" | "Emergency",
-  "summary": "2-3 sentence empathetic summary of what the patient may be experiencing and recommended next steps. Always remind them this is not a medical diagnosis."
+  "summary": "2-3 sentence empathetic summary / diagnosis of what the patient may be experiencing and recommended next steps. Tell them to contanct a specific health care if needed."
 }
 
 --- PATIENT CONTEXT ---
@@ -36,7 +36,7 @@ Recent Lab Results: ${history.labResults || "Not provided"}
 
   try {
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       max_tokens: 512,
     });
@@ -63,5 +63,16 @@ Recent Lab Results: ${history.labResults || "Not provided"}
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Analysis request failed" });
+  }
+};
+
+export const getUserAnalyses = async (req, res) => {
+  try {
+    const analyses = await Analysis.find({ userId: req.userId })
+      .sort({ createdAt: -1 });
+    res.json({ analyses });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch analyses" });
   }
 };
