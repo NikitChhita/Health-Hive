@@ -4,10 +4,10 @@ import { User } from 'lucide-react';
 export const Navbar = ({ onSignInClick, onHomeClick }) => {
   return (
     <nav aria-label="Main navigation" className="fixed top-0 left-0 right-0 z-50 px-4 py-3 md:px-8 md:py-4">
-      <div className="max-w-7xl mx-auto flex items-center justify-between glass-panel rounded-full px-6 py-3 ambient-shadow">
+      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white rounded-full px-6 py-3 ambient-shadow">
         <button
           onClick={onHomeClick}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 hover:opacity-100 transition-opacity"
         >
           <svg viewBox="0 0 1024 1024" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="1024" height="1024" rx="200" fill="#006070"/>
