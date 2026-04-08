@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2, ShieldCheck, Lightbulb, Activity } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Plus, Trash2, ShieldCheck, Lightbulb, Activity, AlertTriangle, AlertCircle, CheckCircle, Siren } from "lucide-react";
 
 const STEPS = [
   { id: 1, label: "Context" },
@@ -103,6 +103,41 @@ const SIDEBAR_CONTENT = {
     title: "Review & Submit",
     body: "Verify all information before sending it to our AI analysis engine.",
     tip: "You can go back and edit any section before submitting.",
+  },
+};
+
+const RATING_CONFIG = {
+  Low: {
+    bg: "bg-emerald-50",
+    border: "border-emerald-200",
+    text: "text-emerald-700",
+    badge: "bg-emerald-100 text-emerald-700",
+    icon: CheckCircle,
+    label: "Low Risk",
+  },
+  Moderate: {
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    text: "text-amber-700",
+    badge: "bg-amber-100 text-amber-700",
+    icon: AlertCircle,
+    label: "Moderate Risk",
+  },
+  High: {
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    text: "text-orange-700",
+    badge: "bg-orange-100 text-orange-700",
+    icon: AlertTriangle,
+    label: "High Risk",
+  },
+  Emergency: {
+    bg: "bg-red-50",
+    border: "border-red-200",
+    text: "text-red-700",
+    badge: "bg-red-100 text-red-700",
+    icon: Siren,
+    label: "Emergency",
   },
 };
 
@@ -592,7 +627,25 @@ function StepReview({ context, symptoms, history, onEdit }) {
   );
 }
 
-function SuccessScreen({ onReset, analysis }) {
+function RatingBadge({ rating }) {
+  const config = RATING_CONFIG[rating] || RATING_CONFIG.Low;
+  const Icon = config.icon;
+  return (
+    <div className={`w-full rounded-2xl p-5 border ${config.bg} ${config.border} flex items-center gap-4`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${config.badge}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-0.5">
+          Urgency Level
+        </p>
+        <p className={`text-lg font-extrabold ${config.text}`}>{config.label}</p>
+      </div>
+    </div>
+  );
+}
+
+function SuccessScreen({ onReset, analysis, rating }) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }}
@@ -610,6 +663,8 @@ function SuccessScreen({ onReset, analysis }) {
           Here's what our AI found based on your symptoms. This is not a medical diagnosis.
         </p>
       </div>
+
+      {rating && <RatingBadge rating={rating} />}
 
       {analysis && (
         <div className="w-full text-left bg-surface-container rounded-2xl p-6 border border-surface-container-high">
@@ -640,6 +695,7 @@ export const SymptomChecker = () => {
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [analysis, setAnalysis] = useState(null);
+  const [rating, setRating] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -679,6 +735,7 @@ export const SymptomChecker = () => {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setAnalysis(data.analysis);
+      setRating(data.rating);
       setSubmitted(true);
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -691,6 +748,7 @@ export const SymptomChecker = () => {
     setStep(1);
     setSubmitted(false);
     setAnalysis(null);
+    setRating(null);
     setError(null);
     setContext({ ageRange: "", sex: "", height: "", weight: "", medications: "", allergies: "" });
     setSymptoms([]);
@@ -719,7 +777,7 @@ export const SymptomChecker = () => {
 
           <div className="flex-1 bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl border border-surface-container-high">
             {submitted ? (
-              <SuccessScreen onReset={handleReset} analysis={analysis} />
+              <SuccessScreen onReset={handleReset} analysis={analysis} rating={rating} />
             ) : (
               <form>
                 <StepBar current={step} />
