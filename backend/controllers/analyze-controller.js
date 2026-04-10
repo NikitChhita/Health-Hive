@@ -1,9 +1,15 @@
 import Groq from 'groq-sdk';
 import Analysis from '../models/analysis.js';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+let groq = null;
+if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY !== 'gsk_placeholder_key_for_development') {
+  groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+}
 
 export const analyzeSymptoms = async (req, res) => {
+  if (!groq) {
+    return res.status(503).json({ error: "AI analysis service not configured. Please set GROQ_API_KEY in environment." });
+  }
   const { context, symptoms, history } = req.body;
 
   const prompt = `

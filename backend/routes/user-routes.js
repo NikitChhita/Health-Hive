@@ -1,6 +1,6 @@
 import express from 'express';
 import { check } from 'express-validator';
-import { getUsers, signup, login, getCurrentUser } from '../controllers/users-controller.js';
+import { getUsers, signup, login, getCurrentUser, updateProfile, updatePassword, updateNotifications, deleteUser } from '../controllers/users-controller.js';
 
 const router = express.Router();
 
@@ -19,5 +19,13 @@ router.post(
 router.post('/login', login);
 
 router.get('/me', getCurrentUser);
+
+router.patch('/profile', updateProfile);
+
+router.patch('/password', updatePassword);
+
+router.patch('/notifications', updateNotifications);
+
+router.delete('/me', deleteUser);
 
 export default router;
