@@ -180,7 +180,7 @@ export const Dashboard = ({ onSignOut, user }) => {
           return;
         }
 
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/analyze`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001/api"}/analyze`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

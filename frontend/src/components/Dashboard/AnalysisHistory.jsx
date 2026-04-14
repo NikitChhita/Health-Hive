@@ -123,7 +123,7 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
   useEffect(() => {
     const fetchAnalyses = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/api/analyze`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001/api"}/analyze`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
