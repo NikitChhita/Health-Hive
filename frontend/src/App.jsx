@@ -13,6 +13,7 @@ import { SymptomChecker } from './components/SymptomChecker';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { AnalysisHistory } from './components/Dashboard/AnalysisHistory';
 import { Settings } from './components/Dashboard/Settings';
+import { clearStoredAuth, getStoredUser } from './utils/authStorage';
 
 // Protected route (It will redirect if a user is not logged in)
 const ProtectedRoute = ({ user, children }) => {
@@ -22,10 +23,7 @@ const ProtectedRoute = ({ user, children }) => {
 
 export default function App() {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState(() => getStoredUser());
 
   const openSignIn = () => setIsSignInOpen(true);
   const closeSignIn = () => setIsSignInOpen(false);
@@ -36,8 +34,7 @@ export default function App() {
   };
 
   const handleSignOut = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    clearStoredAuth();
     setUser(null);
   };
 
@@ -106,6 +103,7 @@ export default function App() {
               <Footer onHomeClick={() => navigate('/')} />
               <BottomNav
                 onSignInClick={openSignIn}
+                onHomeClick={() => navigate('/')}
                 onSymptomCheckerClick={openSignIn}
               />
               <SignInModal

@@ -3,50 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { DashboardHeader } from './DashboardHeader';
-import { History, X, User, Clock, Thermometer, Calendar } from 'lucide-react';
-
-const allAnalyses = [
-  {
-    id: 1,
-    symptoms: 'Severe headache, light sensitivity, nausea',
-    date: 'Mar 29, 2026',
-    time: '11:20 PM',
-    rating: 'High',
-    ratingColor: 'text-error bg-error/10',
-    analysis: 'Symptoms may indicate a severe migraine or potentially more serious neurological condition. Immediate rest in a dark room is advised. If symptoms worsen or include confusion, seek immediate care.',
-    form: { age: 28, gender: 'Female', duration: '2 days', severity: 8 },
-  },
-  {
-    id: 2,
-    symptoms: 'Mild cough, slight sore throat',
-    date: 'Mar 25, 2026',
-    time: '09:15 AM',
-    rating: 'Low',
-    ratingColor: 'text-tertiary bg-tertiary/10',
-    analysis: 'Likely a common cold or mild viral infection. Stay hydrated and monitor temperature. Rest is recommended.',
-    form: { age: 28, gender: 'Female', duration: '3 days', severity: 3 },
-  },
-  {
-    id: 3,
-    symptoms: 'Chest tightness, shortness of breath',
-    date: 'Mar 18, 2026',
-    time: '02:40 PM',
-    rating: 'Emergency',
-    ratingColor: 'text-error bg-error/10',
-    analysis: 'Chest tightness combined with shortness of breath requires immediate medical attention. Please call emergency services or go to the nearest emergency room now.',
-    form: { age: 28, gender: 'Female', duration: '1 hour', severity: 9 },
-  },
-  {
-    id: 4,
-    symptoms: 'Fatigue, mild joint pain',
-    date: 'Mar 10, 2026',
-    time: '08:00 AM',
-    rating: 'Medium',
-    ratingColor: 'text-secondary bg-secondary/10',
-    analysis: 'Fatigue and mild joint pain may point to a viral illness or early inflammatory condition. Monitor symptoms and consult a physician if they persist beyond a week.',
-    form: { age: 28, gender: 'Female', duration: '5 days', severity: 5 },
-  },
-];
+import { AnalysisSupportActions } from './AnalysisSupportActions';
+import { History, X, User, Clock, Thermometer, Calendar, Trash2 } from 'lucide-react';
+import { deleteStoredAnalysis, getStoredAnalyses } from '../../utils/analysisStorage';
 
 const AnalysisModal = ({ item, onClose }) => (
   <AnimatePresence>
@@ -129,6 +88,8 @@ const AnalysisModal = ({ item, onClose }) => (
               </div>
             </div>
 
+            <AnalysisSupportActions rating={item.rating} />
+
             <div className="flex items-center gap-2 text-xs text-on-surface-variant">
               <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
               Submitted on {item.date} at {item.time}
@@ -142,7 +103,18 @@ const AnalysisModal = ({ item, onClose }) => (
 
 export const AnalysisHistory = ({ onSignOut, user }) => {
   const navigate = useNavigate();
+  const [analyses, setAnalyses] = useState(() => getStoredAnalyses());
   const [selected, setSelected] = useState(null);
+
+  const handleDelete = (analysisId) => {
+    if (!window.confirm('Delete this symptom check?')) return;
+
+    setAnalyses(deleteStoredAnalysis(analysisId));
+
+    if (selected?.id === analysisId) {
+      setSelected(null);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -161,7 +133,12 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
           </header>
 
           <div className="grid gap-4">
-            {allAnalyses.map((item, index) => (
+            {analyses.length === 0 ? (
+              <div className="rounded-[2rem] border border-dashed border-surface-container-high bg-white p-10 text-center">
+                <p className="text-sm font-bold text-on-surface">No symptom checks in your history.</p>
+                <p className="mt-2 text-sm text-on-surface-variant">New analyses will appear here after you submit them.</p>
+              </div>
+            ) : analyses.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 16 }}
@@ -179,7 +156,21 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
                     <p className="text-xs text-on-surface-variant mt-0.5">{item.date} at {item.time}</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-primary shrink-0">View Details →</span>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(item.id);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl border border-error/15 px-3 py-2 text-sm font-bold text-error hover:bg-error/5 transition-colors"
+                    aria-label={`Delete symptom check for ${item.symptoms}`}
+                  >
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    Delete
+                  </button>
+                  <span className="text-xs font-bold text-primary">View Details →</span>
+                </div>
               </motion.div>
             ))}
           </div>

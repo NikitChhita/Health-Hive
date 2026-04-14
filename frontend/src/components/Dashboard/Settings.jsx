@@ -4,10 +4,79 @@ import { motion } from 'motion/react';
 import { Sidebar } from './Sidebar';
 import { DashboardHeader } from './DashboardHeader';
 import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut } from 'lucide-react';
+import { clearStoredAuth, getStoredToken, updateStoredUser } from '../../utils/authStorage';
 
 export const Settings = ({ onSignOut, user }) => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState({ email: true, analysis: true, updates: false });
+  const [profileName, setProfileName] = useState(user?.name || '');
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [profileMsg, setProfileMsg] = useState(null);
+  const [passwordMsg, setPasswordMsg] = useState(null);
+
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const token = getStoredToken();
+
+  const handleSaveChanges = async () => {
+    setProfileMsg(null);
+    try {
+      const res = await fetch(`${BASE_URL}/api/users/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ name: profileName, email: profileEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Update failed');
+      updateStoredUser(data.user);
+      setProfileMsg({ type: 'success', text: 'Profile updated.' });
+    } catch (err) {
+      setProfileMsg({ type: 'error', text: err.message });
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    setPasswordMsg(null);
+    if (newPassword !== confirmPassword) {
+      setPasswordMsg({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    try {
+      const res = await fetch(`${BASE_URL}/api/users/me/password`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Update failed');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordMsg({ type: 'success', text: 'Password updated.' });
+    } catch (err) {
+      setPasswordMsg({ type: 'error', text: err.message });
+    }
+  };
+
+  const handleDeleteData = async () => {
+    if (!window.confirm('Are you sure? This will permanently delete your account and all data.')) return;
+    try {
+      const res = await fetch(`${BASE_URL}/api/users/me`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || 'Delete failed');
+      }
+      clearStoredAuth();
+      onSignOut();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-surface">
@@ -53,7 +122,8 @@ export const Settings = ({ onSignOut, user }) => {
                     <input
                       id="settings-name"
                       type="text"
-                      defaultValue={user?.name || ''}
+                      value={profileName}
+                      onChange={e => setProfileName(e.target.value)}
                       placeholder="Your name"
                       className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
@@ -63,13 +133,17 @@ export const Settings = ({ onSignOut, user }) => {
                     <input
                       id="settings-email"
                       type="email"
-                      defaultValue={user?.email || ''}
+                      value={profileEmail}
+                      onChange={e => setProfileEmail(e.target.value)}
                       placeholder="your@email.com"
                       className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
-                <button className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
+                {profileMsg && (
+                  <p className={`text-sm font-medium ${profileMsg.type === 'success' ? 'text-primary' : 'text-error'}`}>{profileMsg.text}</p>
+                )}
+                <button onClick={handleSaveChanges} className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
                   Save Changes
                 </button>
               </div>
@@ -89,19 +163,22 @@ export const Settings = ({ onSignOut, user }) => {
               <div className="p-6 space-y-4">
                 <div className="space-y-1">
                   <label htmlFor="settings-current-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Current Password</label>
-                  <input id="settings-current-pw" type="password" placeholder="••••••••" autoComplete="current-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                  <input id="settings-current-pw" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label htmlFor="settings-new-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">New Password</label>
-                    <input id="settings-new-pw" type="password" placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    <input id="settings-new-pw" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                   </div>
                   <div className="space-y-1">
                     <label htmlFor="settings-confirm-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirm Password</label>
-                    <input id="settings-confirm-pw" type="password" placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    <input id="settings-confirm-pw" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
                   </div>
                 </div>
-                <button className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
+                {passwordMsg && (
+                  <p className={`text-sm font-medium ${passwordMsg.type === 'success' ? 'text-primary' : 'text-error'}`}>{passwordMsg.text}</p>
+                )}
+                <button onClick={handleUpdatePassword} className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
                   Update Password
                 </button>
               </div>
@@ -158,7 +235,7 @@ export const Settings = ({ onSignOut, user }) => {
                 <p className="text-sm text-on-surface-variant leading-relaxed">
                   Your symptom data is stored securely with role-based access control. Only you and authorised providers can view your submissions.
                 </p>
-                <button className="text-sm font-bold text-error hover:underline">
+                <button onClick={handleDeleteData} className="text-sm font-bold text-error hover:underline">
                   Delete All My Data
                 </button>
               </div>

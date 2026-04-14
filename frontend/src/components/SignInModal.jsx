@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, Lock, ArrowRight, User } from 'lucide-react';
+import { persistAuth } from '../utils/authStorage';
 
 export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,8 +38,11 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
         throw new Error(data.message || 'Authentication failed');
       }
 
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      persistAuth({
+        token: data.token,
+        user: data.user,
+        remember: isSignUp ? true : rememberMe,
+      });
       onAuthSuccess(data.user);
     } catch (err) {
       setError(err.message);
@@ -176,7 +181,12 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
               {!isSignUp && (
                 <div className="flex items-center justify-between px-1">
                   <label className="flex items-center gap-2 cursor-pointer group">
-                    <input type="checkbox" className="w-4 h-4 rounded border-surface-container-high text-primary focus:ring-primary/20" />
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-surface-container-high text-primary focus:ring-primary/20"
+                    />
                     <span className="text-xs font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Remember me</span>
                   </label>
                   <a href="#" className="text-xs font-bold text-primary hover:underline">Forgot password?</a>
