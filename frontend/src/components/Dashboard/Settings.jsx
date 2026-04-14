@@ -7,7 +7,7 @@ import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut } from 'luci
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-export const Settings = ({ onSignOut, user }) => {
+export const Settings = ({ onSignOut, user, onUpdateUser }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -75,6 +75,11 @@ export const Settings = ({ onSignOut, user }) => {
       if (!response.ok) {
         setError(data.message || 'Failed to update profile');
         return;
+      }
+
+      //Updates user name without having to sign out and in again
+       if (onUpdateUser) {
+        onUpdateUser({ ...user, name: profileData.name, email: profileData.email });
       }
 
       setMessage('Profile updated successfully');

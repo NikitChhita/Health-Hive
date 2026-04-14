@@ -41,6 +41,12 @@ export default function App() {
     setUser(null);
   };
 
+
+  const handleUpdateUser = (updatedUser) => {
+  setUser(updatedUser);
+  localStorage.setItem('user', JSON.stringify(updatedUser));
+};
+
   const navigate = useNavigate();
 
   return (
@@ -70,7 +76,7 @@ export default function App() {
         path="/settings"
         element={
           <ProtectedRoute user={user}>
-            <Settings onSignOut={handleSignOut} user={user} />
+            <Settings onSignOut={handleSignOut} user={user} onUpdateUser={handleUpdateUser} />
           </ProtectedRoute>
         }
       />
