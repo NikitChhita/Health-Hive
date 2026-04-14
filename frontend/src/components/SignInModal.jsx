@@ -17,7 +17,7 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
     setError('');
     setLoading(true);
 
-    const endpoint = isSignUp ? '/api/users/signup' : '/api/users/login';
+    const endpoint = isSignUp ? '/users/signup' : '/users/login';
     const body = isSignUp
       ? formData
       : { email: formData.email, password: formData.password };
