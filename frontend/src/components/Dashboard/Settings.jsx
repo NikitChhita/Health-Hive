@@ -5,7 +5,7 @@ import { Sidebar } from './Sidebar';
 import { DashboardHeader } from './DashboardHeader';
 import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut } from 'lucide-react';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
 export const Settings = ({ onSignOut, user }) => {
   const navigate = useNavigate();
