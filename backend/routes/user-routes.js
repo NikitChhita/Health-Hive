@@ -1,6 +1,7 @@
 const express = require('express');
 const { check } = require('express-validator');
 const usersController = require('../controllers/users-controller');
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
@@ -19,5 +20,9 @@ router.post(
 router.post('/login', usersController.login);
 
 router.get('/me', usersController.getCurrentUser);
+
+router.patch('/me', checkAuth, usersController.updateProfile);
+router.patch('/me/password', checkAuth, usersController.updatePassword);
+router.delete('/me', checkAuth, usersController.deleteAccount);
 
 module.exports = router;

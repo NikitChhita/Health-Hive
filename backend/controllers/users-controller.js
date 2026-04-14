@@ -133,7 +133,79 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(422).json({ message: 'Name and email are required' });
+  }
+
+  try {
+    const existing = await User.findOne({ email, _id: { $ne: req.userId } });
+    if (existing) {
+      return res.status(422).json({ message: 'Email already in use' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { name, email },
+      { new: true, select: '-password' }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const updatedUser = { id: user.id, name: user.name, email: user.email, createdAt: user.createdAt };
+    res.json({ user: updatedUser });
+  } catch (err) {
+    res.status(500).json({ message: 'Updating profile failed, please try again' });
+  }
+};
+
+const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword || newPassword.length < 6) {
+    return res.status(422).json({ message: 'Valid current and new password (min 6 chars) are required' });
+  }
+
+  try {
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Updating password failed, please try again' });
+  }
+};
+
+const deleteAccount = async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Deleting account failed, please try again' });
+  }
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
 exports.getCurrentUser = getCurrentUser;
+exports.updateProfile = updateProfile;
+exports.updatePassword = updatePassword;
+exports.deleteAccount = deleteAccount;
