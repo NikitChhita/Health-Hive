@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 const allowedOrigins = [
   "https://health-hive-jade.vercel.app",
-  "http://localhost:5174"
+  "http://localhost:5173"
 ];
 
 app.use((req, res, next) => {
