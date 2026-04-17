@@ -1,4 +1,5 @@
 const AUTH_KEYS = ['token', 'user'];
+const REMEMBERED_EMAIL_KEY = 'rememberedEmail';
 
 const getStorageWithUser = () => {
   if (localStorage.getItem('user')) return localStorage;
@@ -38,6 +39,24 @@ export const persistAuth = ({ token, user, remember }) => {
 
   storage.setItem('token', token);
   storage.setItem('user', JSON.stringify(user));
+};
+
+export const getRememberedEmail = () =>
+  localStorage.getItem(REMEMBERED_EMAIL_KEY) || '';
+
+export const persistRememberedEmail = (email) => {
+  const trimmedEmail = email.trim();
+
+  if (!trimmedEmail) {
+    localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+    return;
+  }
+
+  localStorage.setItem(REMEMBERED_EMAIL_KEY, trimmedEmail);
+};
+
+export const clearRememberedEmail = () => {
+  localStorage.removeItem(REMEMBERED_EMAIL_KEY);
 };
 
 export const updateStoredUser = (user) => {

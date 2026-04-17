@@ -35,6 +35,12 @@ const formatDate = (dateStr) => {
 const formatSymptoms = (analysis) =>
   analysis.symptoms?.map((symptom) => symptom.name).join(', ') || '—';
 
+const formatUrgencyLabel = (analysis) => {
+  if (analysis.headline) return analysis.headline;
+  if (typeof analysis.urgencyScore === 'number') return `Urgency Score ${analysis.urgencyScore}/10`;
+  return null;
+};
+
 const AnalysisModal = ({ item, onClose }) => {
   if (!item) return null;
 
@@ -124,9 +130,30 @@ const AnalysisModal = ({ item, onClose }) => {
             <div>
               <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant">AI Analysis</h3>
               <div className="rounded-2xl border border-surface-container-high bg-surface-container p-4">
+                {formatUrgencyLabel(item) && (
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">
+                    {formatUrgencyLabel(item)}
+                  </p>
+                )}
                 <p className="text-sm italic leading-relaxed text-on-surface-variant">&quot;{item.analysis}&quot;</p>
               </div>
             </div>
+
+            {Array.isArray(item.warningSymptoms) && item.warningSymptoms.length > 0 && (
+              <div>
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Flagged Symptoms</h3>
+                <div className="flex flex-wrap gap-2">
+                  {item.warningSymptoms.map((symptom) => (
+                    <span
+                      key={symptom}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold ${ratingStyles[item.rating] || ratingStyles.Low}`}
+                    >
+                      {symptom}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <AnalysisSupportActions rating={item.rating} />
 

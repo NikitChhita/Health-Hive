@@ -35,6 +35,12 @@ const formatDate = (dateStr) => {
 const formatSymptoms = (analysis) =>
   analysis.symptoms?.map((symptom) => symptom.name).join(', ') || '—';
 
+const formatUrgencyLabel = (analysis) => {
+  if (analysis.headline) return analysis.headline;
+  if (typeof analysis.urgencyScore === 'number') return `Urgency Score ${analysis.urgencyScore}/10`;
+  return null;
+};
+
 const AnalysisModal = ({ item, onClose }) => {
   if (!item) return null;
 
@@ -124,9 +130,30 @@ const AnalysisModal = ({ item, onClose }) => {
             <div>
               <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant">AI Analysis</h3>
               <div className="rounded-2xl border border-surface-container-high bg-surface-container p-4">
+                {formatUrgencyLabel(item) && (
+                  <p className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">
+                    {formatUrgencyLabel(item)}
+                  </p>
+                )}
                 <p className="text-sm italic leading-relaxed text-on-surface-variant">&quot;{item.analysis}&quot;</p>
               </div>
             </div>
+
+            {Array.isArray(item.warningSymptoms) && item.warningSymptoms.length > 0 && (
+              <div>
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-on-surface-variant">Flagged Symptoms</h3>
+                <div className="flex flex-wrap gap-2">
+                  {item.warningSymptoms.map((symptom) => (
+                    <span
+                      key={symptom}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold ${ratingStyles[item.rating] || ratingStyles.Low}`}
+                    >
+                      {symptom}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <AnalysisSupportActions rating={item.rating} />
 
@@ -336,21 +363,23 @@ export const Dashboard = ({ onSignOut, user }) => {
               )}
             </section>
 
-            <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <section className="grid grid-cols-1 gap-6">
               <div className="group relative overflow-hidden rounded-[2rem] bg-primary p-8 text-white shadow-xl shadow-primary/20">
                 <div className="relative z-10">
                   <h3 className="mb-2 text-xl font-headline font-extrabold">Emergency Support</h3>
                   <p className="mb-6 text-sm leading-relaxed text-on-primary-container">
                     If you are experiencing a life-threatening emergency, please call emergency services immediately.
                   </p>
-                  <a
-                    href="https://www.google.com/maps/search/hospitals+near+me"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block rounded-xl bg-white px-6 py-3 text-sm font-bold text-primary transition-all hover:bg-on-primary-container"
-                  >
-                    Find Nearest Hospital
-                  </a>
+                  <div className="flex justify-center">
+                    <a
+                      href="https://www.google.com/maps/search/hospitals+near+me"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block rounded-xl bg-white px-6 py-3 text-sm font-bold text-primary transition-all hover:bg-on-primary-container"
+                    >
+                      Find Nearest Hospital
+                    </a>
+                  </div>
                 </div>
                 <Heart className="absolute -bottom-8 -right-8 w-40 h-40 text-white/10 transition-transform duration-500 group-hover:scale-110" aria-hidden="true" />
               </div>

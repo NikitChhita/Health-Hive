@@ -25,6 +25,10 @@ const analysisSchema = new mongoose.Schema({
   },
   analysis: { type: String, required: true },
   rating: { type: String, enum: ['Low', 'Moderate', 'High', 'Emergency'], default: 'Low' },
+  urgencyScore: { type: Number, min: 1, max: 10 },
+  headline: String,
+  needsUrgentCare: { type: Boolean, default: false },
+  warningSymptoms: [String],
   createdAt: { type: Date, default: Date.now },
 });
 
