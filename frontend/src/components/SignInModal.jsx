@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, Lock, ArrowRight, User } from 'lucide-react';
-import { persistAuth } from '../utils/authStorage';
+import {
+  clearRememberedEmail,
+  getRememberedEmail,
+  persistAuth,
+  persistRememberedEmail,
+} from '../utils/authStorage';
 import { API_BASE_URL } from '../utils/api';
 
 export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
+  const rememberedEmail = getRememberedEmail();
   const [isSignUp, setIsSignUp] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [rememberMe, setRememberMe] = useState(true);
+  const [formData, setFormData] = useState({ name: '', email: rememberedEmail, password: '' });
+  const [rememberMe, setRememberMe] = useState(Boolean(rememberedEmail));
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || isSignUp) return;
+
+    const savedEmail = getRememberedEmail();
+
+    setRememberMe(Boolean(savedEmail));
+    setFormData((current) => ({
+      ...current,
+      email: current.email || savedEmail,
+      password: '',
+    }));
+  }, [isOpen, isSignUp]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -36,6 +55,14 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
 
       if (!response.ok) {
         throw new Error(data.message || 'Authentication failed');
+      }
+
+      if (!isSignUp) {
+        if (rememberMe) {
+          persistRememberedEmail(formData.email);
+        } else {
+          clearRememberedEmail();
+        }
       }
 
       persistAuth({

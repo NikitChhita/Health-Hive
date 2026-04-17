@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, ArrowRight, Check, Plus, Trash2, ShieldCheck, Lightbulb, Activity, AlertTriangle, AlertCircle, CheckCircle, Siren } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Plus, Trash2, ShieldCheck, Lightbulb, Activity, AlertTriangle, AlertCircle, CheckCircle, Siren, ExternalLink } from "lucide-react";
 import { getStoredToken } from "../utils/authStorage";
 import { API_BASE_URL } from "../utils/api";
+import { AnalysisSupportActions } from "./Dashboard/AnalysisSupportActions";
 
 const STEPS = [
   { id: 1, label: "Context" },
@@ -116,6 +117,7 @@ const RATING_CONFIG = {
     badge: "bg-emerald-100 text-emerald-700",
     icon: CheckCircle,
     label: "Low Risk",
+    headlineLabel: "Routine",
   },
   Moderate: {
     bg: "bg-amber-50",
@@ -124,6 +126,7 @@ const RATING_CONFIG = {
     badge: "bg-amber-100 text-amber-700",
     icon: AlertCircle,
     label: "Moderate Risk",
+    headlineLabel: "Monitor Closely",
   },
   High: {
     bg: "bg-orange-50",
@@ -132,6 +135,7 @@ const RATING_CONFIG = {
     badge: "bg-orange-100 text-orange-700",
     icon: AlertTriangle,
     label: "High Risk",
+    headlineLabel: "Urgent",
   },
   Emergency: {
     bg: "bg-red-50",
@@ -140,10 +144,11 @@ const RATING_CONFIG = {
     badge: "bg-red-100 text-red-700",
     icon: Siren,
     label: "Emergency",
+    headlineLabel: "Emergency",
   },
 };
 
-const fieldCls = "w-full px-4 py-3 bg-surface-container rounded-2xl text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/25 transition-all text-sm border border-surface-container-high";
+const fieldCls = "w-full px-4 py-3 bg-surface-container rounded-2xl text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm border border-surface-container-high";
 const labelCls = "block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5 ml-1";
 
 function StepBar({ current }) {
@@ -157,17 +162,17 @@ function StepBar({ current }) {
             <div className="flex items-center gap-2">
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300
-                  ${done ? "bg-[#9FE1CB] text-[#04342C]" : active ? "bg-[#0F6E56] text-white" : "bg-surface-container text-on-surface-variant border border-surface-container-high"}`}
+                  ${done ? "bg-tertiary/15 text-tertiary" : active ? "bg-primary text-white" : "bg-surface-container text-on-surface-variant border border-surface-container-high"}`}
               >
                 {done ? <Check className="w-3.5 h-3.5" /> : step.id}
               </div>
               <span className={`text-[10px] font-bold uppercase tracking-wider hidden sm:block transition-colors duration-300
-                ${done ? "text-[#1D9E75]" : active ? "text-[#0F6E56]" : "text-on-surface-variant opacity-50"}`}>
+                ${done ? "text-tertiary" : active ? "text-primary" : "text-on-surface-variant opacity-50"}`}>
                 {step.label}
               </span>
             </div>
             {i < STEPS.length - 1 && (
-              <div className={`flex-grow h-px mx-3 transition-all duration-500 ${done ? "bg-[#9FE1CB]" : "bg-surface-container-high"}`} />
+              <div className={`flex-grow h-px mx-3 transition-all duration-500 ${done ? "bg-tertiary/30" : "bg-surface-container-high"}`} />
             )}
           </div>
         );
@@ -187,27 +192,27 @@ function Sidebar({ step }) {
       className="w-full md:w-64 flex-shrink-0 flex flex-col gap-4 pt-2"
     >
       <div>
-        <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-[#E1F5EE] text-[#085041] mb-3">
+        <span className="inline-block text-[11px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-primary/10 text-primary mb-3">
           {c.badge}
         </span>
-        <h2 className="text-2xl font-headline font-extrabold text-[#0F6E56] leading-tight mb-2">
+        <h2 className="text-2xl font-headline font-extrabold text-primary leading-tight mb-2">
           {c.title}
         </h2>
         <p className="text-sm text-on-surface-variant leading-relaxed">{c.body}</p>
       </div>
       <div className="bg-surface-container rounded-2xl p-4 border border-surface-container-high flex gap-3">
-        <ShieldCheck className="w-4 h-4 text-[#1D9E75] shrink-0 mt-0.5" />
+        <ShieldCheck className="w-4 h-4 text-tertiary shrink-0 mt-0.5" />
         <div>
-          <p className="text-[11px] font-bold text-[#0F6E56] uppercase tracking-wider mb-1">Privacy note</p>
+          <p className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1">Privacy note</p>
           <p className="text-[11px] text-on-surface-variant leading-relaxed">
             Do not include names or sensitive personal identifiers. Your input will be processed by AI for analysis.
           </p>
         </div>
       </div>
       <div className="bg-surface-container rounded-2xl p-4 border border-surface-container-high flex gap-3">
-        <Lightbulb className="w-4 h-4 text-[#1D9E75] shrink-0 mt-0.5" />
+        <Lightbulb className="w-4 h-4 text-tertiary shrink-0 mt-0.5" />
         <div>
-          <p className="text-[11px] font-bold text-[#0F6E56] uppercase tracking-wider mb-1">Tip</p>
+          <p className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1">Tip</p>
           <p className="text-[11px] text-on-surface-variant leading-relaxed">{c.tip}</p>
         </div>
       </div>
@@ -264,10 +269,10 @@ function SymptomCard({ symptom, onChange, onRemove }) {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      className="bg-surface-container rounded-2xl p-5 border border-surface-container-high border-l-2 border-l-[#1D9E75]"
+      className="bg-surface-container rounded-2xl p-5 border border-surface-container-high border-l-2 border-l-tertiary"
     >
       <div className="flex justify-between items-start mb-4">
-        <h4 className="font-bold text-[#0F6E56] flex items-center gap-2 text-sm">
+        <h4 className="font-bold text-primary flex items-center gap-2 text-sm">
           <Activity className="w-4 h-4" />
           {symptom.name}
         </h4>
@@ -298,9 +303,9 @@ function SymptomCard({ symptom, onChange, onRemove }) {
               max="10"
               value={symptom.severity}
               onChange={(e) => onChange("severity", Number(e.target.value))}
-              className="flex-1 h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-[#0F6E56]"
+              className="flex-1 h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary"
             />
-            <span className="text-xs font-bold text-[#0F6E56] min-w-[2rem] text-right">
+            <span className="text-xs font-bold text-primary min-w-[2rem] text-right">
               {symptom.severity}
             </span>
           </div>
@@ -363,8 +368,8 @@ function StepSymptoms({ symptoms, onAdd, onUpdate, onRemove }) {
               onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all border
                 ${activeCategory === cat
-                  ? "bg-[#0F6E56] text-white border-[#0F6E56]"
-                  : "bg-surface-container text-on-surface-variant border-surface-container-high hover:border-[#1D9E75] hover:text-[#0F6E56]"
+                  ? "bg-primary text-white border-primary"
+                  : "bg-surface-container text-on-surface-variant border-surface-container-high hover:border-primary/40 hover:text-primary"
                 }`}
             >
               {cat}
@@ -388,7 +393,7 @@ function StepSymptoms({ symptoms, onAdd, onUpdate, onRemove }) {
                   key={s}
                   type="button"
                   onClick={() => addSymptom(s)}
-                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-[#E1F5EE] text-[#085041] hover:bg-[#9FE1CB] transition-colors"
+                  className="px-3 py-1.5 rounded-full text-xs font-bold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 >
                   + {s}
                 </button>
@@ -424,7 +429,7 @@ function StepSymptoms({ symptoms, onAdd, onUpdate, onRemove }) {
           <button
             type="button"
             onClick={() => addSymptom(query)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0F6E56] hover:text-[#085041] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:text-primary-container transition-colors"
           >
             <Plus className="w-5 h-5" />
           </button>
@@ -435,7 +440,7 @@ function StepSymptoms({ symptoms, onAdd, onUpdate, onRemove }) {
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 4 }}
-                className="absolute z-10 left-0 right-0 top-full mt-1 bg-white rounded-2xl shadow-xl border border-surface-container-high overflow-hidden"
+                className="absolute z-10 left-0 right-0 top-full mt-1 bg-surface-container-lowest rounded-2xl shadow-xl border border-surface-container-high overflow-hidden"
               >
                 <div className="px-4 py-2 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest border-b border-surface-container-high">
                   Suggestions
@@ -528,14 +533,14 @@ function StepMedicalHistory({ data, onChange, onFileChange }) {
           onClick={() => fileRef.current?.click()}
           className="border-2 border-dashed border-surface-container-high rounded-2xl p-8 flex flex-col items-center gap-3 bg-surface-container/30 hover:bg-surface-container cursor-pointer transition-colors"
         >
-          <div className="w-10 h-10 rounded-xl bg-[#E1F5EE] flex items-center justify-center">
-            <Plus className="w-5 h-5 text-[#0F6E56]" />
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Plus className="w-5 h-5 text-primary" />
           </div>
           {data.uploadedFile ? (
-            <p className="text-sm font-bold text-[#0F6E56]">✓ {data.uploadedFile.name}</p>
+            <p className="text-sm font-bold text-primary">✓ {data.uploadedFile.name}</p>
           ) : (
             <div className="text-center">
-              <p className="text-sm font-bold text-[#0F6E56]">Click to upload or drag and drop</p>
+              <p className="text-sm font-bold text-primary">Click to upload or drag and drop</p>
               <p className="text-xs text-on-surface-variant mt-1">JPEG, PNG or PDF · up to 10MB</p>
             </div>
           )}
@@ -560,7 +565,7 @@ function StepReview({ context, symptoms, history, onEdit }) {
         <button
           type="button"
           onClick={() => onEdit(stepIndex)}
-          className="text-xs text-[#0F6E56] font-bold hover:underline"
+          className="text-xs text-primary font-bold hover:underline"
         >
           Edit
         </button>
@@ -579,11 +584,11 @@ function StepReview({ context, symptoms, history, onEdit }) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-[#E1F5EE] border-l-4 border-[#1D9E75] p-4 rounded-r-2xl">
-        <p className="text-xs font-bold text-[#0F6E56] uppercase tracking-wider flex items-center gap-2">
+      <div className="bg-primary/10 border-l-4 border-primary p-4 rounded-r-2xl">
+        <p className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-2">
           <Check className="w-3.5 h-3.5" /> Review your submission
         </p>
-        <p className="text-xs text-[#085041] mt-1 leading-relaxed">
+        <p className="text-xs text-primary/80 mt-1 leading-relaxed">
           Please review all details below before submitting to the AI analysis engine.
         </p>
       </div>
@@ -606,7 +611,7 @@ function StepReview({ context, symptoms, history, onEdit }) {
         ) : (
           symptoms.map((s) => (
             <div key={s.id} className="text-sm border-b border-surface-container-high pb-2.5 last:border-0 last:pb-0">
-              <div className="font-bold text-[#0F6E56]">{s.name}</div>
+              <div className="font-bold text-primary">{s.name}</div>
               <div className="text-on-surface-variant text-xs mt-0.5">
                 Duration: {s.duration || "—"} · Severity: {s.severity}/10
                 {s.notes && ` · "${s.notes}"`}
@@ -647,18 +652,32 @@ function RatingBadge({ rating }) {
   );
 }
 
-function SuccessScreen({ onReset, analysis, rating }) {
+const getUrgentCareMapUrl = (rating) =>
+  rating === "Emergency"
+    ? "https://www.google.com/maps/search/emergency+room+near+me"
+    : "https://www.google.com/maps/search/urgent+care+near+me";
+
+function SuccessScreen({ onReset, result }) {
+  const rating = result?.rating;
+  const analysis = result?.analysis;
+  const urgencyScore = result?.urgencyScore;
+  const headline = result?.headline;
+  const warningSymptoms = result?.warningSymptoms || [];
+  const needsUrgentCare = result?.needsUrgentCare;
+  const config = RATING_CONFIG[rating] || RATING_CONFIG.Low;
+  const Icon = config.icon;
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       className="flex flex-col items-center text-center py-8 px-6 gap-5"
     >
-      <div className="w-16 h-16 bg-[#E1F5EE] rounded-full flex items-center justify-center">
-        <Check className="w-8 h-8 text-[#0F6E56]" />
+      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+        <Check className="w-8 h-8 text-primary" />
       </div>
       <div>
-        <h2 className="text-2xl font-headline font-extrabold text-[#0F6E56] mb-2">
+        <h2 className="text-2xl font-headline font-extrabold text-primary mb-2">
           Assessment Complete
         </h2>
         <p className="text-sm text-on-surface-variant leading-relaxed max-w-sm">
@@ -666,11 +685,46 @@ function SuccessScreen({ onReset, analysis, rating }) {
         </p>
       </div>
 
+      {rating && (
+        <div className={`w-full rounded-2xl border p-5 text-left ${config.bg} ${config.border}`}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${config.badge}`}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                  {config.headlineLabel} {typeof urgencyScore === "number" ? `• Urgency Score ${urgencyScore}/10` : ""}
+                </p>
+                <p className={`mt-1 text-lg font-extrabold ${config.text}`}>
+                  {headline || config.label}
+                </p>
+                <p className="mt-1 text-sm text-on-surface-variant">
+                  {config.label}
+                </p>
+              </div>
+            </div>
+
+            {needsUrgentCare && (
+              <a
+                href={getUrgentCareMapUrl(rating)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-container"
+              >
+                Find Care Nearby
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {rating && <RatingBadge rating={rating} />}
 
       {analysis && (
         <div className="w-full text-left bg-surface-container rounded-2xl p-6 border border-surface-container-high">
-          <p className="text-[10px] font-bold text-[#0F6E56] uppercase tracking-widest mb-3 flex items-center gap-2">
+          <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
             <Activity className="w-3.5 h-3.5" /> AI Analysis
           </p>
           <p className="text-sm text-on-surface leading-relaxed whitespace-pre-wrap">
@@ -679,12 +733,32 @@ function SuccessScreen({ onReset, analysis, rating }) {
         </div>
       )}
 
-      <span className="inline-block bg-[#E1F5EE] text-[#085041] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
+      {warningSymptoms.length > 0 && (
+        <div className="w-full rounded-2xl border border-surface-container-high bg-surface-container-lowest p-6 text-left">
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+            Flagged Symptoms
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {warningSymptoms.map((symptom) => (
+              <span
+                key={symptom}
+                className={`rounded-full px-3 py-1.5 text-xs font-bold ${config.badge}`}
+              >
+                {symptom}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {rating && <AnalysisSupportActions rating={rating} />}
+
+      <span className="inline-block bg-tertiary/10 text-tertiary px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
         ✓ Secure Protocol Active
       </span>
       <button
         onClick={onReset}
-        className="mt-2 py-3 px-8 bg-[#0F6E56] text-white rounded-2xl font-bold text-sm hover:bg-[#085041] transition-colors"
+        className="mt-2 py-3 px-8 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary-container transition-colors"
       >
         Start New Assessment
       </button>
@@ -696,8 +770,7 @@ export const SymptomChecker = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
-  const [analysis, setAnalysis] = useState(null);
-  const [rating, setRating] = useState(null);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -736,8 +809,7 @@ export const SymptomChecker = () => {
 
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      setAnalysis(data.analysis);
-      setRating(data.rating);
+      setResult(data);
       setSubmitted(true);
     } catch (err) {
       setError("Something went wrong. Please try again.");
@@ -749,8 +821,7 @@ export const SymptomChecker = () => {
   const handleReset = () => {
     setStep(1);
     setSubmitted(false);
-    setAnalysis(null);
-    setRating(null);
+    setResult(null);
     setError(null);
     setContext({ ageRange: "", sex: "", height: "", weight: "", medications: "", allergies: "" });
     setSymptoms([]);
@@ -764,7 +835,7 @@ export const SymptomChecker = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 text-on-surface-variant hover:text-[#0F6E56] transition-colors mb-8 group"
+          className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors mb-8 group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           Back to Dashboard
@@ -777,9 +848,9 @@ export const SymptomChecker = () => {
         >
           {!submitted && <Sidebar step={step} />}
 
-          <div className="flex-1 bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl border border-surface-container-high">
+          <div className="flex-1 bg-surface-container-lowest p-8 md:p-10 rounded-[2.5rem] shadow-2xl border border-surface-container-high">
             {submitted ? (
-              <SuccessScreen onReset={handleReset} analysis={analysis} rating={rating} />
+              <SuccessScreen onReset={handleReset} result={result} />
             ) : (
               <form>
                 <StepBar current={step} />
@@ -824,7 +895,7 @@ export const SymptomChecker = () => {
                     type="button"
                     onClick={() => setStep((s) => s - 1)}
                     disabled={step === 1}
-                    className="flex items-center gap-2 text-sm font-bold text-[#0F6E56] hover:underline disabled:opacity-30 disabled:pointer-events-none"
+                    className="flex items-center gap-2 text-sm font-bold text-primary hover:underline disabled:opacity-30 disabled:pointer-events-none"
                   >
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
@@ -841,7 +912,7 @@ export const SymptomChecker = () => {
                       <button
                         type="button"
                         onClick={() => setStep((s) => s + 1)}
-                        className="flex items-center gap-2 bg-[#0F6E56] hover:bg-[#085041] text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-colors"
+                        className="flex items-center gap-2 bg-primary hover:bg-primary-container text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-colors"
                       >
                         Continue <ArrowRight className="w-4 h-4" />
                       </button>
@@ -851,7 +922,7 @@ export const SymptomChecker = () => {
                           type="button"
                           onClick={handleSubmit}
                           disabled={loading}
-                          className="flex items-center gap-2 bg-[#0F6E56] hover:bg-[#085041] disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-colors"
+                          className="flex items-center gap-2 bg-primary hover:bg-primary-container disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-colors"
                         >
                           {loading ? "Analyzing…" : "Submit Assessment"} <Check className="w-4 h-4" />
                         </button>
