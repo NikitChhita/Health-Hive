@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, Plus, Trash2, ShieldCheck, Lightbulb, Activity, AlertTriangle, AlertCircle, CheckCircle, Siren } from "lucide-react";
+import { getStoredToken } from "../utils/authStorage";
+import { API_BASE_URL } from "../utils/api";
 
 const STEPS = [
   { id: 1, label: "Context" },
@@ -722,8 +724,8 @@ export const SymptomChecker = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:5001/api"}/analyze`, {
+      const token = getStoredToken();
+      const res = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

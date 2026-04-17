@@ -13,13 +13,19 @@ export const Sidebar = ({ onSignOut, onNewIntakeClick, activePage = 'overview' }
 
   return (
     <div className="hidden md:flex flex-col w-64 bg-white border-r border-surface-container h-screen sticky top-0">
-      <div className="p-6 flex items-center gap-3">
-        <svg viewBox="0 0 1024 1024" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1024" height="1024" rx="200" fill="#006070"/>
-          <path d="M512 210 L720 332 L720 676 L512 798 L304 676 L304 332 Z" stroke="#FFFFFF" strokeWidth="36" fill="none"/>
-          <path d="M512 382 L512 626 M398 504 L626 504" stroke="#FFFFFF" strokeWidth="40" strokeLinecap="round"/>
-        </svg>
-        <span className="text-xl font-headline font-extrabold text-on-surface tracking-tight">HealthHive</span>
+      <div className="p-6">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
+          aria-label="Go to home"
+        >
+          <svg viewBox="0 0 1024 1024" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="1024" height="1024" rx="200" fill="#006070"/>
+            <path d="M512 210 L720 332 L720 676 L512 798 L304 676 L304 332 Z" stroke="#FFFFFF" strokeWidth="36" fill="none"/>
+            <path d="M512 382 L512 626 M398 504 L626 504" stroke="#FFFFFF" strokeWidth="40" strokeLinecap="round"/>
+          </svg>
+          <span className="text-xl font-headline font-extrabold text-on-surface tracking-tight">HealthHive</span>
+        </button>
       </div>
 
       <div className="px-4 mb-6">

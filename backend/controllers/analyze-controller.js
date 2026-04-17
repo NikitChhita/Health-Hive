@@ -90,3 +90,21 @@ export const getUserAnalyses = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch analyses" });
   }
 };
+
+export const deleteAnalysis = async (req, res) => {
+  try {
+    const deletedAnalysis = await Analysis.findOneAndDelete({
+      _id: req.params.analysisId,
+      userId: req.userId,
+    });
+
+    if (!deletedAnalysis) {
+      return res.status(404).json({ message: 'Analysis not found' });
+    }
+
+    return res.json({ message: 'Analysis deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Failed to delete analysis' });
+  }
+};
