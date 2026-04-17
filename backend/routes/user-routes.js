@@ -1,28 +1,37 @@
-const express = require('express');
-const { check } = require('express-validator');
-const usersController = require('../controllers/users-controller');
-const checkAuth = require('../middleware/check-auth');
+import express from 'express';
+import { check } from 'express-validator';
+import {
+  getUsers,
+  signup,
+  login,
+  getCurrentUser,
+  updateProfile,
+  updatePassword,
+  updateNotifications,
+  deleteUser,
+} from '../controllers/users-controller.js';
+import checkAuth from '../middleware/check-auth.js';
 
 const router = express.Router();
 
-router.get('/', usersController.getUsers);
+router.get('/', getUsers);
 
 router.post(
   '/signup',
   [
     check('name').not().isEmpty(),
     check('email').normalizeEmail().isEmail(),
-    check('password').isLength({ min: 6 })
+    check('password').isLength({ min: 6 }),
   ],
-  usersController.signup
+  signup
 );
 
-router.post('/login', usersController.login);
+router.post('/login', login);
 
-router.get('/me', usersController.getCurrentUser);
+router.get('/me', checkAuth, getCurrentUser);
+router.patch('/me', checkAuth, updateProfile);
+router.patch('/me/password', checkAuth, updatePassword);
+router.patch('/me/notifications', checkAuth, updateNotifications);
+router.delete('/me', checkAuth, deleteUser);
 
-router.patch('/me', checkAuth, usersController.updateProfile);
-router.patch('/me/password', checkAuth, usersController.updatePassword);
-router.delete('/me', checkAuth, usersController.deleteAccount);
-
-module.exports = router;
+export default router;

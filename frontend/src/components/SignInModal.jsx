@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Mail, Lock, ArrowRight, User } from 'lucide-react';
 import { persistAuth } from '../utils/authStorage';
+import { API_BASE_URL } from '../utils/api';
 
 export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,14 +20,13 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
     setError('');
     setLoading(true);
 
-    const endpoint = isSignUp ? '/api/users/signup' : '/api/users/login';
+    const endpoint = isSignUp ? '/users/signup' : '/users/login';
     const body = isSignUp
       ? formData
       : { email: formData.email, password: formData.password };
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-      const response = await fetch(`${BASE_URL}${endpoint}`, {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

@@ -1,80 +1,195 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Sidebar } from './Sidebar';
 import { DashboardHeader } from './DashboardHeader';
 import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut } from 'lucide-react';
 import { clearStoredAuth, getStoredToken, updateStoredUser } from '../../utils/authStorage';
+import { API_BASE_URL } from '../../utils/api';
 
-export const Settings = ({ onSignOut, user }) => {
+const defaultNotifications = { email: true, analysis: true, updates: false };
+
+export const Settings = ({ onSignOut, user, onUpdateUser }) => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState({ email: true, analysis: true, updates: false });
-  const [profileName, setProfileName] = useState(user?.name || '');
-  const [profileEmail, setProfileEmail] = useState(user?.email || '');
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [profileMsg, setProfileMsg] = useState(null);
-  const [passwordMsg, setPasswordMsg] = useState(null);
+  const [loadingAction, setLoadingAction] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
+  });
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [notifications, setNotifications] = useState(user?.notifications || defaultNotifications);
 
-  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  const token = getStoredToken();
+  useEffect(() => {
+    setProfileData({
+      name: user?.name || '',
+      email: user?.email || '',
+    });
+    setNotifications(user?.notifications || defaultNotifications);
+  }, [user]);
 
-  const handleSaveChanges = async () => {
-    setProfileMsg(null);
+  const syncUser = (nextUser) => {
+    if (onUpdateUser) {
+      onUpdateUser(nextUser);
+      return;
+    }
+
+    updateStoredUser(nextUser);
+  };
+
+  const handleProfileChange = (event) => {
+    const { id, value } = event.target;
+    const field = id.replace('settings-', '');
+    setProfileData((current) => ({ ...current, [field]: value }));
+  };
+
+  const handlePasswordChange = (event) => {
+    const { id, value } = event.target;
+    const fieldMap = {
+      'settings-current-pw': 'currentPassword',
+      'settings-new-pw': 'newPassword',
+      'settings-confirm-pw': 'confirmPassword',
+    };
+
+    setPasswordData((current) => ({ ...current, [fieldMap[id]]: value }));
+  };
+
+  const saveProfile = async (event) => {
+    event.preventDefault();
+    setLoadingAction('profile');
+    setFeedback(null);
+
     try {
-      const res = await fetch(`${BASE_URL}/api/users/me`, {
+      const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ name: profileName, email: profileEmail }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getStoredToken()}`,
+        },
+        body: JSON.stringify(profileData),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Update failed');
-      updateStoredUser(data.user);
-      setProfileMsg({ type: 'success', text: 'Profile updated.' });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update profile');
+      }
+
+      syncUser(data.user);
+      setFeedback({ type: 'success', text: data.message || 'Profile updated successfully.' });
     } catch (err) {
-      setProfileMsg({ type: 'error', text: err.message });
+      setFeedback({ type: 'error', text: err.message || 'Failed to update profile.' });
+    } finally {
+      setLoadingAction(null);
     }
   };
 
-  const handleUpdatePassword = async () => {
-    setPasswordMsg(null);
-    if (newPassword !== confirmPassword) {
-      setPasswordMsg({ type: 'error', text: 'New passwords do not match.' });
+  const updatePassword = async (event) => {
+    event.preventDefault();
+    setLoadingAction('password');
+    setFeedback(null);
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setFeedback({ type: 'error', text: 'New passwords do not match.' });
+      setLoadingAction(null);
       return;
     }
+
     try {
-      const res = await fetch(`${BASE_URL}/api/users/me/password`, {
+      const response = await fetch(`${API_BASE_URL}/users/me/password`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getStoredToken()}`,
+        },
+        body: JSON.stringify(passwordData),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Update failed');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      setPasswordMsg({ type: 'success', text: 'Password updated.' });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update password');
+      }
+
+      setPasswordData({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      });
+      setFeedback({ type: 'success', text: data.message || 'Password updated successfully.' });
     } catch (err) {
-      setPasswordMsg({ type: 'error', text: err.message });
+      setFeedback({ type: 'error', text: err.message || 'Failed to update password.' });
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const handleNotificationChange = async (key) => {
+    const previous = notifications;
+    const nextNotifications = { ...notifications, [key]: !notifications[key] };
+
+    setNotifications(nextNotifications);
+    setLoadingAction('notifications');
+    setFeedback(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/me/notifications`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getStoredToken()}`,
+        },
+        body: JSON.stringify(nextNotifications),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update notification preferences');
+      }
+
+      if (data.user) {
+        syncUser(data.user);
+      } else {
+        syncUser({ ...user, notifications: data.notifications || nextNotifications });
+      }
+
+      setFeedback({ type: 'success', text: data.message || 'Notification preferences updated.' });
+    } catch (err) {
+      setNotifications(previous);
+      setFeedback({ type: 'error', text: err.message || 'Failed to update notification preferences.' });
+    } finally {
+      setLoadingAction(null);
     }
   };
 
   const handleDeleteData = async () => {
-    if (!window.confirm('Are you sure? This will permanently delete your account and all data.')) return;
+    if (!window.confirm('Are you sure you want to delete your account and all data? This action cannot be undone.')) {
+      return;
+    }
+
+    setLoadingAction('delete');
+    setFeedback(null);
+
     try {
-      const res = await fetch(`${BASE_URL}/api/users/me`, {
+      const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${getStoredToken()}`,
+        },
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Delete failed');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete account');
       }
+
       clearStoredAuth();
       onSignOut();
     } catch (err) {
-      alert(err.message);
+      setFeedback({ type: 'error', text: err.message || 'Failed to delete account.' });
+      setLoadingAction(null);
     }
   };
 
@@ -82,120 +197,166 @@ export const Settings = ({ onSignOut, user }) => {
     <div className="flex min-h-screen bg-surface">
       <Sidebar onSignOut={onSignOut} onNewIntakeClick={() => navigate('/symptom-checker')} activePage="settings" />
 
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 min-w-0 flex flex-col">
         <DashboardHeader user={user} onSignOut={onSignOut} />
 
-        <div className="p-6 md:p-8 max-w-3xl mx-auto w-full">
+        <div className="mx-auto w-full max-w-3xl p-6 md:p-8">
           <header className="mb-10">
-            <h1 className="text-3xl font-headline font-extrabold text-on-surface flex items-center gap-3">
-              <SettingsIcon className="text-primary w-7 h-7" aria-hidden="true" />
+            <h1 className="flex items-center gap-3 text-3xl font-headline font-extrabold text-on-surface">
+              <SettingsIcon className="w-7 h-7 text-primary" aria-hidden="true" />
               Settings
             </h1>
-            <p className="text-on-surface-variant mt-1">Manage your account and preferences.</p>
+            <p className="mt-1 text-on-surface-variant">Manage your account and preferences.</p>
           </header>
 
-          <div className="space-y-6">
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mb-6 rounded-xl border p-4 text-sm ${
+                feedback.type === 'success'
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                  : 'border-red-200 bg-red-50 text-red-800'
+              }`}
+            >
+              {feedback.text}
+            </motion.div>
+          )}
 
-            {/* Profile */}
+          <div className="space-y-6">
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="overflow-hidden rounded-[1.5rem] border border-surface-container bg-white ambient-shadow"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 border-b border-surface-container px-6 py-4">
                 <User className="w-4 h-4 text-primary" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Profile</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-on-surface">Profile</h2>
               </div>
-              <div className="p-6 space-y-4">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 border-2 border-surface-container flex items-center justify-center">
+              <form onSubmit={saveProfile} className="space-y-4 p-6">
+                <div className="mb-6 flex items-center gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-surface-container bg-primary/10">
                     <User className="w-7 h-7 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="font-bold text-on-surface">{user?.name || 'Guest'}</p>
-                    <p className="text-sm text-on-surface-variant">{user?.email || '—'}</p>
+                    <p className="font-bold text-on-surface">{profileData.name || 'Guest'}</p>
+                    <p className="text-sm text-on-surface-variant">{profileData.email || '—'}</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label htmlFor="settings-name" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Full Name</label>
+                    <label htmlFor="settings-name" className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                      Full Name
+                    </label>
                     <input
                       id="settings-name"
                       type="text"
-                      value={profileName}
-                      onChange={e => setProfileName(e.target.value)}
+                      value={profileData.name}
+                      onChange={handleProfileChange}
                       placeholder="Your name"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full rounded-xl bg-surface-container px-4 py-3 text-sm text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="settings-email" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Email</label>
+                    <label htmlFor="settings-email" className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                      Email
+                    </label>
                     <input
                       id="settings-email"
                       type="email"
-                      value={profileEmail}
-                      onChange={e => setProfileEmail(e.target.value)}
+                      value={profileData.email}
+                      onChange={handleProfileChange}
                       placeholder="your@email.com"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full rounded-xl bg-surface-container px-4 py-3 text-sm text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                 </div>
-                {profileMsg && (
-                  <p className={`text-sm font-medium ${profileMsg.type === 'success' ? 'text-primary' : 'text-error'}`}>{profileMsg.text}</p>
-                )}
-                <button onClick={handleSaveChanges} className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
-                  Save Changes
+                <button
+                  type="submit"
+                  disabled={loadingAction === 'profile'}
+                  className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-primary-container disabled:opacity-60"
+                >
+                  {loadingAction === 'profile' ? 'Saving...' : 'Save Changes'}
                 </button>
-              </div>
+              </form>
             </motion.section>
 
-            {/* Password */}
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="overflow-hidden rounded-[1.5rem] border border-surface-container bg-white ambient-shadow"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 border-b border-surface-container px-6 py-4">
                 <Lock className="w-4 h-4 text-primary" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Password</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-on-surface">Password</h2>
               </div>
-              <div className="p-6 space-y-4">
+              <form onSubmit={updatePassword} className="space-y-4 p-6">
                 <div className="space-y-1">
-                  <label htmlFor="settings-current-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Current Password</label>
-                  <input id="settings-current-pw" type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="••••••••" autoComplete="current-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                  <label htmlFor="settings-current-pw" className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                    Current Password
+                  </label>
+                  <input
+                    id="settings-current-pw"
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={handlePasswordChange}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    className="w-full rounded-xl bg-surface-container px-4 py-3 text-sm text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label htmlFor="settings-new-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">New Password</label>
-                    <input id="settings-new-pw" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    <label htmlFor="settings-new-pw" className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                      New Password
+                    </label>
+                    <input
+                      id="settings-new-pw"
+                      type="password"
+                      value={passwordData.newPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      className="w-full rounded-xl bg-surface-container px-4 py-3 text-sm text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="settings-confirm-pw" className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Confirm Password</label>
-                    <input id="settings-confirm-pw" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="••••••••" autoComplete="new-password" className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" />
+                    <label htmlFor="settings-confirm-pw" className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+                      Confirm Password
+                    </label>
+                    <input
+                      id="settings-confirm-pw"
+                      type="password"
+                      value={passwordData.confirmPassword}
+                      onChange={handlePasswordChange}
+                      placeholder="••••••••"
+                      autoComplete="new-password"
+                      className="w-full rounded-xl bg-surface-container px-4 py-3 text-sm text-on-surface transition-all focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
                   </div>
                 </div>
-                {passwordMsg && (
-                  <p className={`text-sm font-medium ${passwordMsg.type === 'success' ? 'text-primary' : 'text-error'}`}>{passwordMsg.text}</p>
-                )}
-                <button onClick={handleUpdatePassword} className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-container transition-all">
-                  Update Password
+                <button
+                  type="submit"
+                  disabled={loadingAction === 'password'}
+                  className="rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-primary-container disabled:opacity-60"
+                >
+                  {loadingAction === 'password' ? 'Updating...' : 'Update Password'}
                 </button>
-              </div>
+              </form>
             </motion.section>
 
-            {/* Notifications */}
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.16 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="overflow-hidden rounded-[1.5rem] border border-surface-container bg-white ambient-shadow"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 border-b border-surface-container px-6 py-4">
                 <Bell className="w-4 h-4 text-primary" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Notifications</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-on-surface">Notifications</h2>
               </div>
-              <div className="p-6 space-y-4">
+              <div className="space-y-4 p-6">
                 {[
                   { key: 'email', label: 'Email notifications', description: 'Receive updates and alerts via email' },
                   { key: 'analysis', label: 'Analysis complete', description: 'Notify when an AI analysis is ready' },
@@ -207,41 +368,46 @@ export const Settings = ({ onSignOut, user }) => {
                       <p className="text-xs text-on-surface-variant">{description}</p>
                     </div>
                     <button
+                      type="button"
                       role="switch"
                       aria-checked={notifications[key]}
                       aria-label={label}
-                      onClick={() => setNotifications(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 ${notifications[key] ? 'bg-primary' : 'bg-surface-container-high'}`}
+                      onClick={() => handleNotificationChange(key)}
+                      disabled={loadingAction === 'notifications'}
+                      className={`relative h-6 w-11 shrink-0 rounded-full transition-colors duration-200 disabled:opacity-60 ${notifications[key] ? 'bg-primary' : 'bg-surface-container-high'}`}
                     >
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${notifications[key] ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${notifications[key] ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
                   </div>
                 ))}
               </div>
             </motion.section>
 
-            {/* Privacy */}
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.24 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="overflow-hidden rounded-[1.5rem] border border-surface-container bg-white ambient-shadow"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 border-b border-surface-container px-6 py-4">
                 <Shield className="w-4 h-4 text-primary" aria-hidden="true" />
-                <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Privacy & Data</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-on-surface">Privacy & Data</h2>
               </div>
-              <div className="p-6 space-y-3">
-                <p className="text-sm text-on-surface-variant leading-relaxed">
+              <div className="space-y-3 p-6">
+                <p className="text-sm leading-relaxed text-on-surface-variant">
                   Your symptom data is stored securely with role-based access control. Only you and authorised providers can view your submissions.
                 </p>
-                <button onClick={handleDeleteData} className="text-sm font-bold text-error hover:underline">
-                  Delete All My Data
+                <button
+                  type="button"
+                  onClick={handleDeleteData}
+                  disabled={loadingAction === 'delete'}
+                  className="text-sm font-bold text-error transition-opacity hover:underline disabled:opacity-60"
+                >
+                  {loadingAction === 'delete' ? 'Processing...' : 'Delete All My Data'}
                 </button>
               </div>
             </motion.section>
 
-            {/* Sign out */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -249,13 +415,12 @@ export const Settings = ({ onSignOut, user }) => {
             >
               <button
                 onClick={onSignOut}
-                className="w-full flex items-center justify-center gap-2 py-4 text-error border border-error/20 bg-error/5 hover:bg-error/10 rounded-2xl font-bold text-sm transition-all"
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-error/20 bg-error/5 py-4 text-sm font-bold text-error transition-all hover:bg-error/10"
               >
                 <LogOut className="w-4 h-4" aria-hidden="true" />
                 Sign Out
               </button>
             </motion.div>
-
           </div>
         </div>
       </main>

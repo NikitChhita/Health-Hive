@@ -13,7 +13,7 @@ import { SymptomChecker } from './components/SymptomChecker';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { AnalysisHistory } from './components/Dashboard/AnalysisHistory';
 import { Settings } from './components/Dashboard/Settings';
-import { clearStoredAuth, getStoredUser } from './utils/authStorage';
+import { clearStoredAuth, getStoredUser, updateStoredUser } from './utils/authStorage';
 
 // Protected route (It will redirect if a user is not logged in)
 const ProtectedRoute = ({ user, children }) => {
@@ -36,6 +36,12 @@ export default function App() {
   const handleSignOut = () => {
     clearStoredAuth();
     setUser(null);
+  };
+
+
+  const handleUpdateUser = (updatedUser) => {
+    setUser(updatedUser);
+    updateStoredUser(updatedUser);
   };
 
   const navigate = useNavigate();
@@ -67,7 +73,7 @@ export default function App() {
         path="/settings"
         element={
           <ProtectedRoute user={user}>
-            <Settings onSignOut={handleSignOut} user={user} />
+            <Settings onSignOut={handleSignOut} user={user} onUpdateUser={handleUpdateUser} />
           </ProtectedRoute>
         }
       />

@@ -16,6 +16,13 @@ const supportConfig = {
     icon: ShieldPlus,
     className: 'bg-primary text-white hover:bg-primary-container',
   },
+  Moderate: {
+    href: 'https://www.google.com/maps/search/urgent+care+near+me',
+    label: 'Get Help',
+    description: 'Locate urgent care if symptoms continue or worsen.',
+    icon: ShieldPlus,
+    className: 'bg-primary text-white hover:bg-primary-container',
+  },
   Medium: {
     href: 'https://www.google.com/maps/search/urgent+care+near+me',
     label: 'Get Help',

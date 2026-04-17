@@ -1,24 +1,33 @@
-require("dotenv").config();
-
-const express = require('express');
-const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const usersRoutes = require('./routes/user-routes');
+import 'dotenv/config';
+import express from 'express';
+import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
+import usersRoutes from './routes/user-routes.js';
+import analyzeRouter from './routes/analyze.js';
 
 const app = express();
 
 app.use(bodyParser.json());
 
+const allowedOrigins = [
+  "https://health-hive-jade.vercel.app",
+  "http://localhost:5173"
+];
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
   next();
 });
 
+app.use("/api/analyze", analyzeRouter);
 app.use('/api/users', usersRoutes);
 
 const url = process.env.MONGO_URL;

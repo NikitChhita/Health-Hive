@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   if (req.method === 'OPTIONS') {
     return next();
   }
