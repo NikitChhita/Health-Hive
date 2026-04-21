@@ -320,11 +320,11 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
                           event.stopPropagation();
                           handleDelete(item._id);
                         }}
-                        className="inline-flex items-center gap-2 rounded-xl border border-error/15 px-3 py-2 text-sm font-bold text-error transition-colors hover:bg-error/5"
+                        className="rounded-full p-2 text-error transition-colors hover:bg-error/5"
                         aria-label={`Delete symptom check for ${symptoms}`}
                       >
                         <Trash2 className="w-4 h-4" aria-hidden="true" />
-                        Delete
+                        
                       </button>
                       <span className="text-xs font-bold text-primary">View Details →</span>
                     </div>
