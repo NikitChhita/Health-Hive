@@ -16,12 +16,7 @@ const ITEMS = [
   {
     icon: ShieldCheck,
     title: "Privacy First",
-    description: "Your symptom data is stored securely with role-based access control. Only you can see your submissions.",
-  },
-  {
-    icon: UserCheck,
-    title: "Role-Based Access",
-    description: "Separate access levels for patients, providers, and admins ensure data is only seen by the right people.",
+    description: "Your symptom data is stored securely. Only you can see your submissions.",
   },
 ];
 
@@ -49,7 +44,7 @@ export const Ethics = () => {
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {ITEMS.map((item, index) => (
             <motion.div
               key={index}
