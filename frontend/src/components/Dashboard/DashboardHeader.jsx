@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // 1. Added useNavigate
-import { Search, Bell, User, ChevronDown, LogOut, Settings } from 'lucide-react'; // 2. Added Settings icon
+import { Search, User, ChevronDown, LogOut, Settings } from 'lucide-react'; // 2. Added Settings icon
 
 export const DashboardHeader = ({ user, onSignOut }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -33,7 +33,6 @@ export const DashboardHeader = ({ user, onSignOut }) => {
 
       <div className="flex items-center gap-4">
         <button aria-label="Notifications" className="relative p-3 text-on-surface-variant hover:bg-surface-container rounded-2xl transition-all group">
-          <Bell className="w-5 h-5 group-hover:text-primary" aria-hidden="true" />
           <span aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-white" />
         </button>
 
