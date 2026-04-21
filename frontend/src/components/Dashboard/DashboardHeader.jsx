@@ -32,7 +32,6 @@ export const DashboardHeader = ({ user, onSignOut }) => {
       </div>
 
       <div className="flex items-center gap-4">
-          <span aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-white" />
 
         <div className="h-10 w-px bg-surface-container mx-2" />
 
