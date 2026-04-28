@@ -14,6 +14,7 @@ import { Dashboard } from './components/Dashboard/Dashboard';
 import { AnalysisHistory } from './components/Dashboard/AnalysisHistory';
 import { Settings } from './components/Dashboard/Settings';
 import { clearStoredAuth, getStoredUser, updateStoredUser } from './utils/authStorage';
+import { ResetPassword } from './components/ResetPassword';
 
 // Protected route (It will redirect if a user is not logged in)
 const ProtectedRoute = ({ user, children }) => {
@@ -87,6 +88,8 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+      {/* Reset Password - public */}
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
       {/* Home - public */}
       <Route

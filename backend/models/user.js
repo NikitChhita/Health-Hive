@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
     analysis: { type: Boolean, default: true },
     updates: { type: Boolean, default: false }
   },
+  resetPasswordToken: { type: String }, 
+  resetPasswordExpires: { type: Date }, 
+
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
