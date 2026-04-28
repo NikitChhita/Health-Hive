@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import User from '../models/user.js';
 import Analysis from '../models/analysis.js';
 
+import crypto from 'crypto';
+import { sendResetEmail } from '../utils/mailer.js';
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const serializeUser = (user) => ({
@@ -250,6 +253,72 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  console.log('forgotPassword called with:', req.body);
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    console.log('User found:', user ? 'yes' : 'no');
+
+    if (!user) {
+      return res.json({ message: 'If that email exists, a reset link has been sent.' });
+    }
+
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${rawToken}`;
+    
+    console.log('Attempting to send email to:', user.email);
+    await sendResetEmail(user.email, resetUrl);
+    console.log('Email sent successfully');
+
+    return res.json({ message: 'If that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('Forgot password error:', err.message);
+    return res.status(500).json({ message: 'Failed to send reset email, please try again' });
+  }
+};
+
+// --- ADD THIS ---
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(422).json({ message: 'Password must be at least 6 characters' });
+  }
+
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: new Date() }, // not expired
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset link' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    user.updatedAt = new Date();
+    await user.save();
+
+    return res.json({ message: 'Password reset successfully. You can now log in.' });
+  } catch (err) {
+    return res.status(500).json({ message: 'Password reset failed, please try again' });
+  }
+};
+
+
 export {
   getUsers,
   signup,
@@ -258,5 +327,7 @@ export {
   updateProfile,
   updatePassword,
   updateNotifications,
-  deleteUser,
+  deleteUser, 
+  forgotPassword, 
+  resetPassword,
 };

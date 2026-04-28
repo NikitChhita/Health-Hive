@@ -9,6 +9,8 @@ import {
   updatePassword,
   updateNotifications,
   deleteUser,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/users-controller.js';
 import checkAuth from '../middleware/check-auth.js';
 
@@ -27,6 +29,10 @@ router.post(
 );
 
 router.post('/login', login);
+
+// Forgot/reset password (no auth needed)
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 router.get('/me', checkAuth, getCurrentUser);
 router.patch('/me', checkAuth, updateProfile);
