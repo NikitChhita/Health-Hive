@@ -12,7 +12,7 @@ export const Sidebar = ({ onSignOut, onNewIntakeClick, activePage = 'overview' }
   const navigate = useNavigate();
 
   return (
-    <div className="hidden md:flex flex-col w-64 bg-white border-r border-surface-container h-screen sticky top-0">
+    <div className="hidden md:flex flex-col w-64 bg-surface-container-lowest border-r border-surface-container h-screen sticky top-0">
       <div className="p-6 flex items-center gap-3">
         <svg viewBox="0 0 1024 1024" width="40" height="40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="1024" height="1024" rx="200" fill="#006070"/>

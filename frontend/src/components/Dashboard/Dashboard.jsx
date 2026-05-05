@@ -53,7 +53,7 @@ const AnalysisModal = ({ item, onClose }) => (
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 16, scale: 0.97 }}
           transition={{ duration: 0.2 }}
-          className="relative w-full max-w-lg bg-white rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh]"
+          className="relative w-full max-w-lg bg-surface-container-lowest rounded-[2rem] shadow-2xl overflow-y-auto max-h-[90vh]"
         >
           <div className="flex items-center justify-between p-6 border-b border-surface-container">
             <div className="flex items-center gap-3">
@@ -257,7 +257,7 @@ export const Dashboard = ({ onSignOut, user }) => {
                         key={item._id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-6 md:p-8 rounded-[2rem] ambient-shadow border border-surface-container hover:border-primary/20 transition-all group cursor-pointer"
+                        className="bg-surface-container-lowest p-6 md:p-8 rounded-[2rem] ambient-shadow border border-surface-container hover:border-primary/20 transition-all group cursor-pointer"
                         onClick={() => setSelectedAnalysis(item)}
                       >
                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">

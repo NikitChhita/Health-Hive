@@ -66,7 +66,7 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
             initial={{ opacity: 0, scale: 1, y: 0 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 1, y: 20 }}
-            className="relative w-full max-w-md bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-y-auto max-h-[90vh] scale-90 sm:scale-100 transition-transform"
+            className="relative w-full max-w-md bg-surface-container-lowest p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl overflow-y-auto max-h-[90vh] scale-90 sm:scale-100 transition-transform"
           >
             <button
               aria-label="Close dialog"
@@ -92,14 +92,14 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
               <button
                 onClick={() => { setIsSignUp(false); setError(''); }}
                 aria-pressed={!isSignUp}
-                className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${!isSignUp ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${!isSignUp ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
               >
                 Sign In
               </button>
               <button
                 onClick={() => { setIsSignUp(true); setError(''); }}
                 aria-pressed={isSignUp}
-                className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${isSignUp ? 'bg-white text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
+                className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all ${isSignUp ? 'bg-surface-container-lowest text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
               >
                 Sign Up
               </button>

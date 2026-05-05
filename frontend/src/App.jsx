@@ -13,6 +13,7 @@ import { SymptomChecker } from './components/SymptomChecker';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { AnalysisHistory } from './components/Dashboard/AnalysisHistory';
 import { Settings } from './components/Dashboard/Settings';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Protected route (It will redirect if a user is not logged in)
 const ProtectedRoute = ({ user, children }) => {
@@ -44,82 +45,84 @@ export default function App() {
   const navigate = useNavigate();
 
   return (
-    <Routes>
-      {/* Dashboard - protected */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute user={user}>
-            <Dashboard onSignOut={handleSignOut} user={user} />
-          </ProtectedRoute>
-        }
-      />
+    <ThemeProvider>
+      <Routes>
+        {/* Dashboard - protected */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute user={user}>
+              <Dashboard onSignOut={handleSignOut} user={user} />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Analysis History - protected */}
-      <Route
-        path="/history"
-        element={
-          <ProtectedRoute user={user}>
-            <AnalysisHistory onSignOut={handleSignOut} user={user} />
-          </ProtectedRoute>
-        }
-      />
+        {/* Analysis History - protected */}
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute user={user}>
+              <AnalysisHistory onSignOut={handleSignOut} user={user} />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Settings - protected */}
-      <Route
-        path="/settings"
-        element={
-          <ProtectedRoute user={user}>
-            <Settings onSignOut={handleSignOut} user={user} />
-          </ProtectedRoute>
-        }
-      />
+        {/* Settings - protected */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute user={user}>
+              <Settings onSignOut={handleSignOut} user={user} />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Symptom Checker - protected */}
-      <Route
-        path="/symptom-checker"
-        element={
-          <ProtectedRoute user={user}>
-            <SymptomChecker />
-          </ProtectedRoute>
-        }
-      />
+        {/* Symptom Checker - protected */}
+        <Route
+          path="/symptom-checker"
+          element={
+            <ProtectedRoute user={user}>
+              <SymptomChecker />
+            </ProtectedRoute>
+          }
+        />
 
-      {/* Home - public */}
-      <Route
-        path="/"
-        element={
-          // If already logged in, redirect to dashboard
-          user ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <div className="min-h-screen bg-surface">
-             <Navbar onSignInClick={openSignIn} onHomeClick={() => navigate('/')} />
-              
-              <main>
-                <Hero onStartClick={openSignIn} />
-                <Features />
-                <Ethics />
-                <About />
-                <CTA onStartClick={openSignIn} />
-              </main>
-              <Footer onHomeClick={() => navigate('/')} />
-              <BottomNav
-                onSignInClick={openSignIn}
-                onSymptomCheckerClick={openSignIn}
-              />
-              <SignInModal
-                isOpen={isSignInOpen}
-                onClose={closeSignIn}
-                onAuthSuccess={handleAuthSuccess}
-              />
-            </div>
-          )
-        }
-      />
+        {/* Home - public */}
+        <Route
+          path="/"
+          element={
+            // If already logged in, redirect to dashboard
+            user ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <div className="min-h-screen bg-surface">
+               <Navbar onSignInClick={openSignIn} onHomeClick={() => navigate('/')} />
+                
+                <main>
+                  <Hero onStartClick={openSignIn} />
+                  <Features />
+                  <Ethics />
+                  <About />
+                  <CTA onStartClick={openSignIn} />
+                </main>
+                <Footer onHomeClick={() => navigate('/')} />
+                <BottomNav
+                  onSignInClick={openSignIn}
+                  onSymptomCheckerClick={openSignIn}
+                />
+                <SignInModal
+                  isOpen={isSignInOpen}
+                  onClose={closeSignIn}
+                  onAuthSuccess={handleAuthSuccess}
+                />
+              </div>
+            )
+          }
+        />
 
-      {/* Catch all - redirect to home */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Catch all - redirect to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ThemeProvider>
   );
 }

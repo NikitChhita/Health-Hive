@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Sidebar } from './Sidebar';
 import { DashboardHeader } from './DashboardHeader';
-import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut } from 'lucide-react';
+import { Settings as SettingsIcon, User, Lock, Bell, Shield, LogOut, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 export const Settings = ({ onSignOut, user }) => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -231,15 +233,15 @@ export const Settings = ({ onSignOut, user }) => {
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="bg-white dark:bg-surface-container rounded-[1.5rem] ambient-shadow border border-surface-container dark:border-surface-container-high overflow-hidden"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container dark:border-surface-container-high">
                 <User className="w-4 h-4 text-primary" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Profile</h2>
               </div>
               <form onSubmit={saveProfile} className="p-6 space-y-4">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 border-2 border-surface-container flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 border-2 border-surface-container dark:border-surface-container-high flex items-center justify-center">
                     <User className="w-7 h-7 text-primary" aria-hidden="true" />
                   </div>
                   <div>
@@ -256,7 +258,7 @@ export const Settings = ({ onSignOut, user }) => {
                       value={profileData.name}
                       onChange={handleProfileChange}
                       placeholder="Your name"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full px-4 py-3 bg-surface-container dark:bg-surface-container-high rounded-xl text-sm text-on-surface dark:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                   <div className="space-y-1">
@@ -267,7 +269,7 @@ export const Settings = ({ onSignOut, user }) => {
                       value={profileData.email}
                       onChange={handleProfileChange}
                       placeholder="your@email.com"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full px-4 py-3 bg-surface-container dark:bg-surface-container-high rounded-xl text-sm text-on-surface dark:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
@@ -286,9 +288,9 @@ export const Settings = ({ onSignOut, user }) => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.08 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="bg-white dark:bg-surface-container rounded-[1.5rem] ambient-shadow border border-surface-container dark:border-surface-container-high overflow-hidden"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container dark:border-surface-container-high">
                 <Lock className="w-4 h-4 text-primary" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Password</h2>
               </div>
@@ -302,7 +304,7 @@ export const Settings = ({ onSignOut, user }) => {
                     onChange={handlePasswordChange}
                     placeholder="••••••••"
                     autoComplete="current-password"
-                    className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                    className="w-full px-4 py-3 bg-surface-container dark:bg-surface-container-high rounded-xl text-sm text-on-surface dark:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -315,7 +317,7 @@ export const Settings = ({ onSignOut, user }) => {
                       onChange={handlePasswordChange}
                       placeholder="••••••••"
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full px-4 py-3 bg-surface-container dark:bg-surface-container-high rounded-xl text-sm text-on-surface dark:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                   <div className="space-y-1">
@@ -327,7 +329,7 @@ export const Settings = ({ onSignOut, user }) => {
                       onChange={handlePasswordChange}
                       placeholder="••••••••"
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 bg-surface-container rounded-xl text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                      className="w-full px-4 py-3 bg-surface-container dark:bg-surface-container-high rounded-xl text-sm text-on-surface dark:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
@@ -346,9 +348,9 @@ export const Settings = ({ onSignOut, user }) => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.16 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              className="bg-white dark:bg-surface-container rounded-[1.5rem] ambient-shadow border border-surface-container dark:border-surface-container-high overflow-hidden"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container dark:border-surface-container-high">
                 <Bell className="w-4 h-4 text-primary" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Notifications</h2>
               </div>
@@ -370,12 +372,75 @@ export const Settings = ({ onSignOut, user }) => {
                       aria-label={label}
                       onClick={() => handleNotificationChange(key)}
                       disabled={loading}
-                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 disabled:opacity-60 ${notifications[key] ? 'bg-primary' : 'bg-surface-container-high'}`}
+                      className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 disabled:opacity-60 ${notifications[key] ? 'bg-primary' : 'bg-surface-container-high dark:bg-surface-container-highest'}`}
                     >
-                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${notifications[key] ? 'translate-x-5' : 'translate-x-0'}`} />
+                      <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white dark:bg-surface-container-high rounded-full shadow transition-transform duration-200 ${notifications[key] ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
                   </div>
                 ))}
+              </div>
+            </motion.section>
+
+            {/* Appearance */}
+            <motion.section
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.24 }}
+              className="bg-white dark:bg-surface-container rounded-[1.5rem] ambient-shadow border border-surface-container dark:border-surface-container-high overflow-hidden"
+            >
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container dark:border-surface-container-high">
+                <Sun className="w-4 h-4 text-primary" aria-hidden="true" />
+                <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Appearance</h2>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-bold text-on-surface">Dark Mode</p>
+                    <p className="text-xs text-on-surface-variant">Switch between light and dark themes</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={theme === 'dark'}
+                    aria-label="Toggle dark mode"
+                    onClick={toggleTheme}
+                    className={`relative w-11 h-6 rounded-full transition-colors duration-200 shrink-0 ${theme === 'dark' ? 'bg-primary' : 'bg-surface-container-high'}`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 flex items-center justify-center ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`}>
+                      {theme === 'dark' ? (
+                        <Moon className="w-3 h-3 text-on-surface" />
+                      ) : (
+                        <Sun className="w-3 h-3 text-on-surface" />
+                      )}
+                    </span>
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t border-surface-container-highest">
+                  <button
+                    type="button"
+                    onClick={() => theme !== 'light' && toggleTheme()}
+                    className={`p-3 rounded-xl transition-all border-2 ${
+                      theme === 'light'
+                        ? 'bg-surface border-primary text-on-surface'
+                        : 'bg-surface-container border-surface-container-high text-on-surface-variant hover:border-primary'
+                    }`}
+                  >
+                    <Sun className="w-4 h-4 mx-auto mb-2" />
+                    <p className="text-xs font-bold">Light</p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => theme !== 'dark' && toggleTheme()}
+                    className={`p-3 rounded-xl transition-all border-2 ${
+                      theme === 'dark'
+                        ? 'bg-surface-container-high border-primary text-on-surface'
+                        : 'bg-surface-container border-surface-container-high text-on-surface-variant hover:border-primary'
+                    }`}
+                  >
+                    <Moon className="w-4 h-4 mx-auto mb-2" />
+                    <p className="text-xs font-bold">Dark</p>
+                  </button>
+                </div>
               </div>
             </motion.section>
 
@@ -383,10 +448,10 @@ export const Settings = ({ onSignOut, user }) => {
             <motion.section
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.24 }}
-              className="bg-white rounded-[1.5rem] ambient-shadow border border-surface-container overflow-hidden"
+              transition={{ delay: 0.32 }}
+              className="bg-white dark:bg-surface-container rounded-[1.5rem] ambient-shadow border border-surface-container dark:border-surface-container-high overflow-hidden"
             >
-              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container">
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-surface-container dark:border-surface-container-high">
                 <Shield className="w-4 h-4 text-primary" aria-hidden="true" />
                 <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider">Privacy & Data</h2>
               </div>
@@ -409,7 +474,7 @@ export const Settings = ({ onSignOut, user }) => {
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32 }}
+              transition={{ delay: 0.4 }}
             >
               <button
                 onClick={onSignOut}

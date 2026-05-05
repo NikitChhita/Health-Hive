@@ -18,7 +18,7 @@ export const DashboardHeader = ({ user, onSignOut }) => {
   }, []);
 
   return (
-    <header className="h-20 bg-white border-b border-surface-container px-6 flex items-center justify-between sticky top-0 z-40">
+    <header className="h-20 bg-surface border-b border-surface-container px-6 flex items-center justify-between sticky top-0 z-40">
       <div className="flex-1 max-w-xl">
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant group-focus-within:text-primary transition-colors" aria-hidden="true" />
@@ -34,7 +34,7 @@ export const DashboardHeader = ({ user, onSignOut }) => {
       <div className="flex items-center gap-4">
         <button aria-label="Notifications" className="relative p-3 text-on-surface-variant hover:bg-surface-container rounded-2xl transition-all group">
           <Bell className="w-5 h-5 group-hover:text-primary" aria-hidden="true" />
-          <span aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-white" />
+          <span aria-hidden="true" className="absolute top-3 right-3 w-2 h-2 bg-error rounded-full border-2 border-surface" />
         </button>
 
         <div className="h-10 w-px bg-surface-container mx-2" />
@@ -59,7 +59,7 @@ export const DashboardHeader = ({ user, onSignOut }) => {
           </button>
 
           {dropdownOpen && (
-            <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-surface-container overflow-hidden z-45">
+            <div className="absolute right-0 top-full mt-2 w-52 bg-surface-container rounded-2xl shadow-xl border border-surface-container overflow-hidden z-45">
               {/* 4. Added Settings Button */}
               <button
                 onClick={() => {
