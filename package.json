@@ -1,0 +1,11 @@
+{
+  "name": "health-hive",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "build": "echo \"No root build step required\"",
+    "start": "npm --workspace backend start"
+  }
+}
