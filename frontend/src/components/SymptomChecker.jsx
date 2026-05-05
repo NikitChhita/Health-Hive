@@ -798,13 +798,32 @@ export const SymptomChecker = () => {
 
     try {
       const token = getStoredToken();
+
+      let imageBase64 = null;
+      let imageMediaType = null;
+
+      if (history.uploadedFile) {
+        const reader = new FileReader();
+        imageBase64 = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(history.uploadedFile);
+        });
+        imageMediaType = history.uploadedFile.type;
+      }
+
       const res = await fetch(`${API_BASE_URL}/analyze`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ context, symptoms, history }),
+        body: JSON.stringify({ context, symptoms, history: {
+          ...history,
+          uploadedFile: null, // don't send the File object
+          imageBase64,
+          imageMediaType,
+        }}),
       });
 
       const data = await res.json();

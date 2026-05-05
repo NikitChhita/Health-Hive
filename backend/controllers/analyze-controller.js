@@ -51,20 +51,26 @@ const normalizeAnalysis = (parsed, symptoms) => {
 };
 
 export const analyzeSymptoms = async (req, res) => {
+  console.log('analyzeSymptoms hit'); 
+
   if (!groq) {
-    return res.status(503).json({ error: "AI analysis service not configured. Please set GROQ_API_KEY in environment." });
+    return res.status(503).json({ error: "AI analysis service not configured." });
   }
+
   const { context, symptoms, history } = req.body;
+  const { imageBase64, imageMediaType } = history;
+  console.log('Image received:', !!imageBase64, '| Media type:', imageMediaType);
+
 
   const prompt = `
 You are a helpful medical intake assistant. A patient has submitted health information through a symptom tracker.
+${imageBase64 ? "The patient has uploaded an image of a physical condition. Analyze it carefully and use it as a primary input for your assessment, even if no text symptoms are listed." : ""}
 
 Use these criteria to determine the rating:
 - "Low" (score 1-3): Minor symptoms, self-manageable at home, no red flags
 - "Moderate" (score 4-5): Symptoms may warrant a doctor visit within a few days
 - "High" (score 6-7): Needs prompt same-day medical attention or urgent care
 - "Emergency" (score 8-10): Life-threatening symptoms, call 911 immediately
-
 
 Respond ONLY with a valid JSON object in this exact format, nothing else:
 {
@@ -76,8 +82,8 @@ Respond ONLY with a valid JSON object in this exact format, nothing else:
   "warningSymptoms": ["list", "of", "concerning", "symptoms"]
 }
 
-Set needsUrgentCare to true only when rating is "High" or "Emergency".
-If the symptoms are vague, choose "Low", ask for more detail in the summary, and keep warningSymptoms empty.
+If an image has been provided, analyze it carefully and base your rating primarily on what you observe visually, even if no symptoms are listed in text.
+If no image and no symptoms are provided, choose "Low" and ask for more detail in the summary.
 
 --- PATIENT CONTEXT ---
 Age Range: ${context.ageRange || "Not provided"}
@@ -88,9 +94,13 @@ Current Medications: ${context.medications || "None listed"}
 Known Allergies: ${context.allergies || "None listed"}
 
 --- SYMPTOMS ---
-${symptoms.length === 0 ? "No symptoms listed." : symptoms.map((s) =>
-  `- ${s.name}: duration ${s.duration || "unknown"}, severity ${s.severity}/10${s.notes ? `, notes: "${s.notes}"` : ""}`
-).join("\n")}
+${symptoms.length === 0
+  ? imageBase64
+    ? "No text symptoms listed. Please analyze the uploaded image to determine the assessment."
+    : "No symptoms listed."
+  : symptoms.map((s) =>
+    `- ${s.name}: duration ${s.duration || "unknown"}, severity ${s.severity}/10${s.notes ? `, notes: "${s.notes}"` : ""}`
+  ).join("\n")}
 
 --- MEDICAL HISTORY ---
 Family History: ${history.familyHistory || "Not provided"}
@@ -98,10 +108,20 @@ Past Diagnoses: ${history.pastDiagnoses || "Not provided"}
 Recent Lab Results: ${history.labResults || "Not provided"}
   `;
 
+  const userContent = imageBase64
+    ? [
+        {
+          type: "image_url",
+          image_url: { url: `data:${imageMediaType};base64,${imageBase64}` },
+        },
+        { type: "text", text: prompt },
+      ]
+    : prompt;
+
   try {
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
+      model: imageBase64 ? "meta-llama/llama-4-scout-17b-16e-instruct" : "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: userContent }],
       max_tokens: 512,
     });
 

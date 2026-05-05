@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // 1. Added useNavigate
 import { Search, User, ChevronDown, LogOut, Settings } from 'lucide-react'; // 2. Added Settings icon
 
-export const DashboardHeader = ({ user, onSignOut }) => {
+export const DashboardHeader = ({ user, onSignOut, onSearch }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate(); // 3. Initialize navigate
@@ -26,6 +26,7 @@ export const DashboardHeader = ({ user, onSignOut }) => {
             type="search"
             aria-label="Search symptoms or previous analyses"
             placeholder="Search symptoms or previous analyses..."
+            onChange={(e) => onSearch?.(e.target.value)}
             className="w-full pl-12 pr-4 py-3 bg-surface-container rounded-2xl text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all"
           />
         </div>

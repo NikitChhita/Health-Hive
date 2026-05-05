@@ -174,6 +174,19 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+
+const filteredAnalyses = analyses.filter((item) => {
+  const q = searchQuery.toLowerCase();
+  return (
+    formatSymptoms(item).toLowerCase().includes(q) ||
+    item.analysis?.toLowerCase().includes(q) ||
+    item.rating?.toLowerCase().includes(q) ||
+    item.headline?.toLowerCase().includes(q)
+  );
+});
+
 
   useEffect(() => {
     let ignore = false;
@@ -261,7 +274,7 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
       <Sidebar onSignOut={onSignOut} onNewIntakeClick={() => navigate('/symptom-checker')} activePage="history" />
 
       <main className="flex-1 min-w-0 flex flex-col">
-        <DashboardHeader user={user} onSignOut={onSignOut} />
+        <DashboardHeader user={user} onSignOut={onSignOut} onSearch={setSearchQuery} />
 
         <div className="mx-auto w-full max-w-5xl p-6 md:p-8">
           <header className="mb-10">
@@ -289,9 +302,9 @@ export const AnalysisHistory = ({ onSignOut, user }) => {
             </div>
           ) : (
             <div className="grid gap-4">
-              {analyses.map((item, index) => {
+              {filteredAnalyses.map((item, index) => {
                 const { date, time } = formatDate(item.createdAt);
-                const symptoms = formatSymptoms(item);
+                const symptoms = formatSymptoms(item) !== '—' ? formatSymptoms(item) : (item.headline || 'Image analysis');
 
                 return (
                   <motion.div

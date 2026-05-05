@@ -7,7 +7,8 @@ import analyzeRouter from './routes/analyze.js';
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 const allowedOrigins = [
   "https://health-hive-jade.vercel.app",

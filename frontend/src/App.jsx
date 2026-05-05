@@ -97,7 +97,7 @@ export default function App() {
             <Navigate to="/dashboard" replace />
           ) : (
             <div className="min-h-screen bg-surface">
-             <Navbar onSignInClick={openSignIn} onHomeClick={() => navigate('/')} />
+              <Navbar onSignInClick={openSignIn} onHomeClick={() => navigate('/')} />
               
               <main>
                 <Hero onStartClick={openSignIn} />

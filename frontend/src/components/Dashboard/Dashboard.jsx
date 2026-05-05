@@ -8,6 +8,8 @@ import { ArrowRight, Activity, Heart, X, User, Clock, Thermometer, Calendar, Tra
 import { getStoredToken } from '../../utils/authStorage';
 import { API_BASE_URL } from '../../utils/api';
 
+
+
 const ratingStyles = {
   Low: 'text-tertiary bg-tertiary/10',
   Moderate: 'text-secondary bg-secondary/10',
@@ -31,6 +33,7 @@ const formatDate = (dateStr) => {
     }),
   };
 };
+
 
 const formatSymptoms = (analysis) =>
   analysis.symptoms?.map((symptom) => symptom.name).join(', ') || '—';
@@ -169,11 +172,25 @@ const AnalysisModal = ({ item, onClose }) => {
 };
 
 export const Dashboard = ({ onSignOut, user }) => {
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const [analyses, setAnalyses] = useState([]);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+
+const filteredAnalyses = analyses
+  .slice(0, 4)
+  .filter((item) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      formatSymptoms(item).toLowerCase().includes(q) ||
+      item.analysis?.toLowerCase().includes(q) ||
+      item.rating?.toLowerCase().includes(q) ||
+      item.headline?.toLowerCase().includes(q)
+    );
+  });
 
   useEffect(() => {
     let ignore = false;
@@ -262,14 +279,14 @@ export const Dashboard = ({ onSignOut, user }) => {
       <Sidebar onSignOut={onSignOut} onNewIntakeClick={() => navigate('/symptom-checker')} />
 
       <main className="flex-1 min-w-0 flex flex-col">
-        <DashboardHeader user={user} onSignOut={onSignOut} />
+        <DashboardHeader user={user} onSignOut={onSignOut} onSearch={setSearchQuery} />
 
         <div className="mx-auto w-full max-w-5xl p-6 md:p-8">
           <header className="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
             <div>
               <h1 className="text-3xl font-headline font-extrabold text-on-surface">Health Dashboard</h1>
               <p className="mt-1 text-on-surface-variant">
-                Welcome back, {user?.name?.split(' ')[0] || 'there'} — track and manage your symptom analyses.
+                Welcome back, {user?.name?.split(' ')[0] || 'there'}. Track and Manage your symptom analyses.
               </p>
             </div>
             <button
@@ -285,7 +302,7 @@ export const Dashboard = ({ onSignOut, user }) => {
             <section>
               <h3 className="mb-6 flex items-center gap-2 text-xl font-headline font-extrabold text-on-surface">
                 <Activity className="w-5 h-5 text-primary" aria-hidden="true" />
-                All Analyses
+                Recent Analyses
               </h3>
 
               {error && (
@@ -305,9 +322,9 @@ export const Dashboard = ({ onSignOut, user }) => {
                 </div>
               ) : (
                 <div className="grid gap-6">
-                  {analyses.map((item) => {
+                  {filteredAnalyses.map((item) => {
                     const { date, time } = formatDate(item.createdAt);
-                    const symptoms = formatSymptoms(item);
+                   const symptoms = formatSymptoms(item) !== '—' ? formatSymptoms(item) : (item.headline || 'Image analysis');
 
                     return (
                       <motion.div
