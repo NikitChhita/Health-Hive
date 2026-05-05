@@ -17,6 +17,10 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
+
   useEffect(() => {
     if (!isOpen || isSignUp) return;
 
@@ -73,6 +77,25 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
       onAuthSuccess(data.user);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setForgotMessage('');
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail }),
+      });
+      const data = await response.json();
+      setForgotMessage(data.message);
+    } catch (err) {
+      setForgotMessage('Something went wrong, please try again.');
     } finally {
       setLoading(false);
     }
@@ -142,7 +165,41 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
                 {error}
               </div>
             )}
-
+            {showForgotPassword && (
+              <div className="mb-4 p-4 bg-surface-container rounded-2xl space-y-3">
+                <p className="text-sm font-bold text-on-surface">Reset your password</p>
+                {forgotMessage ? (
+                  <p className="text-sm text-primary">{forgotMessage}</p>
+                ) : (
+                  <>
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="Enter your email"
+                      className="w-full px-4 py-3 bg-white rounded-xl text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        disabled={loading}
+                        className="flex-1 py-2 bg-primary text-white rounded-xl text-sm font-bold disabled:opacity-60"
+                      >
+                        {loading ? 'Sending...' : 'Send reset link'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowForgotPassword(false); setForgotMessage(''); }}
+                        className="flex-1 py-2 bg-surface-container-high text-on-surface rounded-xl text-sm font-bold"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
             <form className="space-y-4" onSubmit={handleSubmit} noValidate>
               {isSignUp && (
                 <motion.div
@@ -216,7 +273,13 @@ export const SignInModal = ({ isOpen, onClose, onAuthSuccess }) => {
                     />
                     <span className="text-xs font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">Remember me</span>
                   </label>
-                  <a href="#" className="text-xs font-bold text-primary hover:underline">Forgot password?</a>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-xs font-bold text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
               )}
 
