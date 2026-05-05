@@ -14,7 +14,7 @@ This project is intended as a research and software engineering prototype, not a
 - Saved analysis history per user
 - Profile, password, notification preference, and account deletion endpoints
 - Responsive React interface built with Vite, Tailwind CSS, Motion, and Lucide icons
-
+- Added Google Maps external link to the dashboard for users to locate nearby hospitals after receiving their urgency result
 ## Tech Stack
 
 **Frontend**
