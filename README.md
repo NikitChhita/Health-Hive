@@ -75,6 +75,9 @@ Create a `.env` file in `backend/`:
 MONGO_URL=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 GROQ_API_KEY=your_groq_api_key
+EMAIL_USER=your_email_address
+EMAIL_PASS=your_email_app_password
+FRONTEND_URL=https://your-frontend-domain.com
 PORT=5001
 ```
 
@@ -137,6 +140,7 @@ Protected routes require an `Authorization: Bearer <token>` header.
 - HealthHive is a research prototype and should not be used for medical diagnosis.
 - Emergency symptoms should always be handled by calling emergency services or contacting a qualified medical professional.
 - The AI analysis service requires a valid `GROQ_API_KEY`; without it, analysis requests return a service configuration error.
+- Password reset emails require `EMAIL_USER`, `EMAIL_PASS`, and `FRONTEND_URL` to be set in the backend environment.
 - CORS is currently configured for the deployed frontend and local Vite development URL in `backend/app.js`.
 
 ## Available Scripts

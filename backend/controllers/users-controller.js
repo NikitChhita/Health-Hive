@@ -272,7 +272,8 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
     await user.save();
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${rawToken}`;
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').replace(/\/$/, '');
+    const resetUrl = `${frontendUrl}/reset-password/${rawToken}`;
     
     console.log('Attempting to send email to:', user.email);
     await sendResetEmail(user.email, resetUrl);
